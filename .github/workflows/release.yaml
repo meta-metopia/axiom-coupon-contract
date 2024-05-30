@@ -1,0 +1,26 @@
+name: Release ABI
+on:
+  release:
+    types:
+      - released
+jobs:
+  upload-abi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - name: Install dependencies
+        run: pnpm install
+      - name: Compile ABI
+        run: pnpm compile
+      - name: Upload ABI to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: artifacts/contracts/nft/Nft1155.sol/NFTContract.json
+          asset_name: NFTContract.abi.json
+          tag: ${{ github.ref }}
+          overwrite: true
