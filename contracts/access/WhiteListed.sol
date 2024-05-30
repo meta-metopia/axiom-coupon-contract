@@ -9,7 +9,7 @@ contract WhiteListed {
     }
 
     /**
-     * @dev Mapping of whitelisted users. And only whitelisted users can create coupons
+     * @dev Mapping of whitelisted users.
      */
     mapping(address => bool) private whileListedUsers;
 
@@ -19,7 +19,7 @@ contract WhiteListed {
     modifier onlyWhileListedUsers() {
         require(
             whileListedUsers[msg.sender],
-            "Only whitelisted users can create coupons"
+            "40301: Only whitelisted users can call this function"
         );
         _;
     }
