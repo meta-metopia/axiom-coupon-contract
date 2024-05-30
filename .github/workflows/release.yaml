@@ -31,4 +31,4 @@ jobs:
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           endpoint: ${{ secrets.AWS_ENDPOINT }}
           source_dir: "artifacts/contracts/nft/Nft1155.sol"
-          destination_dir: "artifacts/axiom-coupon-contract/contracts/nft/Nft1155.sol"
+          destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/contracts/nft/Nft1155.sol"
