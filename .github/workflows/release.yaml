@@ -16,7 +16,7 @@ jobs:
         run: pnpm install
       - name: Compile ABI
         run: pnpm compile
-      - name: Upload ABI to release
+      - name: Upload NFT ABI to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -24,3 +24,11 @@ jobs:
           asset_name: NFTContract.abi.json
           tag: ${{ github.ref }}
           overwrite: true
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          endpoint: ${{ secrets.AWS_ENDPOINT }}
+          source_dir: "artifacts/contracts/nft/Nft1155.sol/NFTContract.json"
+          destination_dir: "artifacts/contracts/nft/NFTContract.abi.json"
