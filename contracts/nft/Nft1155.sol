@@ -93,8 +93,8 @@ contract NFTContract is
      * Mint a new NFT to the user with the given id
      */
     function mint(address to, uint256 id) external onlyWhileListedUsers {
-        require(_currentSupply < _supply, "Supply limit reached");
-        require(_owners[id] == address(0), "NFT already minted");
+        require(_currentSupply < _supply, "1001: Supply limit reached");
+        require(_owners[id] == address(0), "1002: NFT already minted");
 
         _mint(to, id, 1, "");
         _reedemState[id] = ReedemState.NOT_REDEEMED;

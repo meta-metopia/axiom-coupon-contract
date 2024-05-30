@@ -154,7 +154,7 @@ describe("Nft1155", () => {
             const [owner] = await hre.ethers.getSigners();
             return [owner.address];
           },
-          expectRevertMessage: "ERC1155: mint to the zero address",
+          expectRevertMessage: "1001: Supply limit reached",
           opts: {
             creatorAddress: "",
             author: "hello",
@@ -208,14 +208,16 @@ describe("Nft1155", () => {
         const signer = await args.minter();
         const [mintToAddress, tokenId] = await args.mintTo();
 
-        const response = await contract
-          .connect(signer)
-          .mint(mintToAddress, tokenId);
-        expect(response).to.be.ok;
-
         if (args.expectRevertMessage) {
-          await expect(response).to.be.revertedWith(args.expectRevertMessage);
+          console.log("should be");
+          await expect(
+            contract.connect(signer).mint(mintToAddress, tokenId)
+          ).to.be.revertedWith(args.expectRevertMessage);
         } else {
+          const response = await contract
+            .connect(signer)
+            .mint(mintToAddress, tokenId);
+          expect(response).to.be.ok;
           expect(await contract.balanceOf(mintToAddress, tokenId)).to.be.equal(
             args.expectBalance
           );

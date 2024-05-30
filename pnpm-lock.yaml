@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@nomicfoundation/hardhat-chai-matchers':
+        specifier: ^2.0.6
+        version: 2.0.6(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(chai@4.4.1)(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5))
+      '@nomicfoundation/hardhat-ethers':
+        specifier: ^3.0.6
+        version: 3.0.6(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5))
       '@openzeppelin/contracts':
         specifier: ^5.0.2
         version: 5.0.2
