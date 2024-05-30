@@ -1,0 +1,33 @@
+name: Test and Release
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests
+        run: pnpm test
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: ${{ (github.event.pusher.name != 'github action') && (github.ref == 'refs/heads/main') }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          branch: main

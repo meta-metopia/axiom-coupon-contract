@@ -21,6 +21,7 @@ contract NFTContract is
     ApprovedMerchant[] private _approvedMerchant;
     ApprovedPayment[] private _approvedPayment;
     uint256 private _supply;
+    uint256 private _currentSupply;
 
     mapping(uint256 => ReedemState) private _reedemState;
     mapping(address => uint256[]) private _ownedNFTs;
@@ -58,8 +59,16 @@ contract NFTContract is
         _setURI(_createCouponOpts.metadata.url);
         _name = _createCouponOpts.name;
         _desc = _createCouponOpts.desc;
+        _currentSupply = 0;
     }
 
+    function totalSupply() public view returns (uint256) {
+        return _supply;
+    }
+
+    /**
+     * Initialize metadata for the NFT
+     */
     function initializeMetadata(Metadata memory data) private {
         _metadata.approveDuration = data.approveDuration;
         _metadata.approveTime = data.approveTime;
@@ -80,18 +89,28 @@ contract NFTContract is
         }
     }
 
-    function mint(address to, uint256 id) external onlyOwner {
+    /**
+     * Mint a new NFT to the user with the given id
+     */
+    function mint(address to, uint256 id) external onlyWhileListedUsers {
+        require(_currentSupply < _supply, "Supply limit reached");
+        require(_owners[id] == address(0), "NFT already minted");
+
         _mint(to, id, 1, "");
         _reedemState[id] = ReedemState.NOT_REDEEMED;
         _ownedNFTs[to].push(id);
         _mintTime[id] = block.timestamp;
         _owners[id] = to;
+        _currentSupply += 1;
     }
 
+    /**
+     * Reedeem NFT using token Id. Only whitelisted users can redeem NFT
+     */
     function reedeem(
         uint256 id,
         RedeemCouponOpts memory _redeemCouponOpts
-    ) external {
+    ) external onlyWhileListedUsers {
         address userAddress = address(
             bytes20(bytes(_redeemCouponOpts.userAddress))
         );
