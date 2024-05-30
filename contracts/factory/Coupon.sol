@@ -1,7 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract Coupon {
+interface ICouponUtils {
+    function generateCouponToken(
+        uint8 contractAddressIndex,
+        uint8 contractAddressLength,
+        uint256 contractAddressValue,
+        uint8 tokenIdIndex,
+        uint8 tokenIdLength,
+        uint256 tokenIdValue
+    ) external pure returns (string memory);
+
+    function parseCouponToken(
+        string memory couponToken
+    )
+        external
+        pure
+        returns (
+            uint8 contractAddressIndex,
+            uint256 contractAddressValue,
+            uint8 tokenIdIndex,
+            uint256 tokenIdValue
+        );
+}
+
+contract CouponUtils is ICouponUtils {
     function generateCouponToken(
         uint8 contractAddressIndex, // Index of the contract address
         uint8 contractAddressLength, // Length of the contract address value
