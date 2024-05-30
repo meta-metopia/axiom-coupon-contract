@@ -2,12 +2,36 @@
 pragma solidity ^0.8.20;
 
 import "./IFactory.sol";
+import "./Coupon.sol";
+import "../nft/INftContract.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "../nft/Nft1155.sol";
+import "../access/WhiteListed.sol";
 
-contract NFTCouponFactory is INFTCouponFactory {
+contract NFTCouponFactory is INFTCouponFactory, Ownable, WhiteListed {
+    ICouponUtils private couponUtils;
+
+    constructor(address initialOwner) Ownable(initialOwner) {
+        couponUtils = new CouponUtils();
+    }
+
+    /**
+     * Set the coupon utils contract
+     */
+    function setCouponUtils(ICouponUtils _couponUtils) public onlyOwner {
+        couponUtils = _couponUtils;
+    }
+
     function createCoupon(
         CreateCouponOpts memory createCouponOpts
-    ) external override returns (CreateCouponResponse memory response) {
-        // Default implementation with default return value
+    )
+        external
+        override
+        onlyWhileListedUsers
+        returns (CreateCouponResponse memory response)
+    {
+        // Generate the coupon token
+
         return CreateCouponResponse("");
     }
 

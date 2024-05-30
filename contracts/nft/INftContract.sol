@@ -1,47 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-interface INFTContract {
-    /**
-     * Mint NFT tokens
-     */
-    function mint(
-        address account,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) external;
+import "../dto/getCouponById.sol";
+import "../dto/redeemCoupon.sol";
 
+interface INFTContract {
     /**
      * Transfer tokens from one address to another
      */
-    function transfer(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount
-    ) external;
+    function mint(address to, uint256 id) external;
 
     /**
-     * Reedeem NFT using token Id. Only owner can call this function
-     * @param id Token Id
+     * Reedeem NFT using token Id. Only owner can redeem NFT
      */
-    function reedeem(uint256 id) external;
+    function reedeem(
+        uint256 id,
+        RedeemCouponOpts memory redeemCouponOpts
+    ) external;
 
     /**
      * List all NFTs owned by an address
      */
     function listByOwner(
         address owner
-    ) external view returns (uint256[] memory);
+    ) external view returns (GetTokenByIdResponse[] memory);
 
     /**
      * Get NFT by Id
      */
     function getById(
         uint256 id
-    )
-        external
-        view
-        returns (uint256, uint256, address, uint256, uint256, string memory);
+    ) external view returns (GetTokenByIdResponse memory);
 }

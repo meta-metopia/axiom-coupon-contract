@@ -6,7 +6,22 @@ import "./coupon.sol";
 
 struct GetCouponByIdResponse {
     string couponId;
-    string creatorAddress;
+    address creatorAddress;
+    string author;
+    uint256 mintTime;
+    address ownerAddr;
+    uint256 ownerTime;
+    uint256 supply;
+    string name;
+    string desc;
+    uint256 fieldId;
+    string currency;
+    Metadata metadata;
+}
+
+struct GetTokenByIdResponse {
+    uint256 couponId;
+    address creatorAddress;
     string author;
     uint256 mintTime;
     address ownerAddr;
