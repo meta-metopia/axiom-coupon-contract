@@ -30,5 +30,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           endpoint: ${{ secrets.AWS_ENDPOINT }}
-          source_dir: "artifacts/contracts/nft/Nft1155.sol/NFTContract.json"
-          destination_dir: "artifacts/contracts/nft/NFTContract.abi.json"
+          source_dir: "artifacts/contracts/nft/Nft1155.sol"
+          destination_dir: "artifacts/axiom-coupon-contract/contracts/nft/Nft1155.sol"
