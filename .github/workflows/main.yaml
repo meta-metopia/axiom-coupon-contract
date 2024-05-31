@@ -6,6 +6,7 @@ jobs:
   codegen:
     name: Codegen
     uses: ./.github/workflows/generate-java.yaml
+    secrets: inherit
   test:
     runs-on: ubuntu-latest
     steps:

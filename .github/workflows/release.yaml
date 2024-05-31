@@ -10,3 +10,4 @@ jobs:
     with:
       should-upload-abi: true
       should-upload-sdk: true
+    secrets: inherit
