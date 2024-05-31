@@ -562,6 +562,171 @@ describe("Nft1155", () => {
           },
         },
       },
+      {
+        name: "should not be able to redeem when user doesn't have the token",
+        args: {
+          initialOwners: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [owner.address, address1.address];
+          },
+          mintSigner: async () => {
+            const [owner] = await hre.ethers.getSigners();
+            return owner;
+          },
+          mintTo: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [address1.address, 1];
+          },
+          redeemSigner: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return address1;
+          },
+          redeemOpts: async () => {
+            const [owner, address1, address2] = await hre.ethers.getSigners();
+            const message = "hello";
+            const signature = await signMessage(message, address2);
+
+            const opts: RedeemCouponOptsStruct = {
+              couponId: "",
+              paymentAddress: address2.address,
+              paymentSignature: signature,
+              paymentMessage: "",
+              paymentNonce: 0,
+              userAddress: address2.address,
+              userSignature: signature,
+              userMessage: message,
+              userNonce: 1,
+              approveTime: 0,
+              approveDuration: 0,
+            };
+            return opts;
+          },
+          expectRevertMessage: "40004: User does not own the NFT",
+          opts: {
+            creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+            author: "hello",
+            supply: 10,
+            name: "test",
+            desc: "test desc",
+            fieldId: "1",
+            price: "10",
+            currency: "CNY",
+            metadata: {
+              approvedMerchant: [
+                {
+                  approvedMerchantName: "test",
+                  approvedMerchantAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              approvedPayment: [
+                {
+                  approvedPaymentName: "test",
+                  approvedPaymentAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              couponType: "1",
+              couponSubtitle: "Subtitle",
+              couponDetails: "Some",
+              url: "https://www.google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 0,
+                claimLimit: 0,
+                isTransfer: false,
+              },
+              reedemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          },
+        },
+      },
+      {
+        name: "should not be able to redeem when user does not have the permission",
+        args: {
+          initialOwners: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [owner.address, address1.address];
+          },
+          mintSigner: async () => {
+            const [owner] = await hre.ethers.getSigners();
+            return owner;
+          },
+          mintTo: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [address1.address, 1];
+          },
+          redeemSigner: async () => {
+            const [owner, address1, address2] = await hre.ethers.getSigners();
+            return address2;
+          },
+          redeemOpts: async () => {
+            const [owner, address1, address2] = await hre.ethers.getSigners();
+            const message = "hello";
+            const signature = await signMessage(message, address2);
+
+            const opts: RedeemCouponOptsStruct = {
+              couponId: "",
+              paymentAddress: address2.address,
+              paymentSignature: signature,
+              paymentMessage: "",
+              paymentNonce: 0,
+              userAddress: address2.address,
+              userSignature: signature,
+              userMessage: message,
+              userNonce: 1,
+              approveTime: 0,
+              approveDuration: 0,
+            };
+            return opts;
+          },
+          expectRevertMessage:
+            "40301: Only whitelisted users can call this function",
+          opts: {
+            creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+            author: "hello",
+            supply: 10,
+            name: "test",
+            desc: "test desc",
+            fieldId: "1",
+            price: "10",
+            currency: "CNY",
+            metadata: {
+              approvedMerchant: [
+                {
+                  approvedMerchantName: "test",
+                  approvedMerchantAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              approvedPayment: [
+                {
+                  approvedPaymentName: "test",
+                  approvedPaymentAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              couponType: "1",
+              couponSubtitle: "Subtitle",
+              couponDetails: "Some",
+              url: "https://www.google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 0,
+                claimLimit: 0,
+                isTransfer: false,
+              },
+              reedemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          },
+        },
+      },
     ];
 
     testCases.forEach(({ name, args }) => {
@@ -592,6 +757,129 @@ describe("Nft1155", () => {
 
           const nft = await contract.getById(tokenId);
           expect(nft.metadata.reedemState).to.be.equal(args.expectStatus);
+        }
+      });
+    });
+  });
+
+  describe("List", () => {
+    interface Args {
+      numberOfCreatedNFTs: number;
+      address: () => Promise<string>;
+    }
+
+    const testCases: TestCase<Args>[] = [
+      {
+        name: "should be able to list all NFTs",
+        args: {
+          numberOfCreatedNFTs: 10,
+          address: async () => {
+            const [owner] = await hre.ethers.getSigners();
+            return owner.address;
+          },
+        },
+      },
+      {
+        name: "should be able to list all NFTs",
+        args: {
+          numberOfCreatedNFTs: 1,
+          address: async () => {
+            const [owner] = await hre.ethers.getSigners();
+            return owner.address;
+          },
+        },
+      },
+      {
+        name: "should be able to list all NFTs",
+        args: {
+          numberOfCreatedNFTs: 0,
+          address: async () => {
+            const [owner] = await hre.ethers.getSigners();
+            return owner.address;
+          },
+        },
+      },
+    ];
+
+    testCases.forEach(({ name, args }) => {
+      it(name, async () => {
+        const nft = await hre.ethers.getContractFactory("NFTContract");
+        const address = await args.address();
+        const [owner] = await hre.ethers.getSigners();
+
+        const opts = {
+          creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+          author: "hello",
+          supply: Math.max(args.numberOfCreatedNFTs, 1),
+          name: "test",
+          desc: "test desc",
+          fieldId: "1",
+          price: "10",
+          currency: "CNY",
+          metadata: {
+            approvedMerchant: [
+              {
+                approvedMerchantName: "test",
+                approvedMerchantAddr:
+                  "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+              },
+            ],
+            approvedPayment: [
+              {
+                approvedPaymentName: "test",
+                approvedPaymentAddr:
+                  "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+              },
+            ],
+            couponType: "1",
+            couponSubtitle: "Subtitle",
+            couponDetails: "Some",
+            url: "https://www.google.com",
+            expirationTime: 0,
+            expirationStartTime: 0,
+            rule: {
+              value: 0,
+              claimLimit: 0,
+              isTransfer: false,
+            },
+            reedemState: 0,
+            approveTime: 0,
+            approveDuration: 0,
+          },
+        };
+        const contract = await nft.connect(owner).deploy(opts, [owner.address]);
+
+        expect(await contract.totalSupply()).to.be.equal(
+          Math.max(args.numberOfCreatedNFTs, 1)
+        );
+
+        for (let i = 0; i < args.numberOfCreatedNFTs; i++) {
+          const response = await contract.connect(owner).mint(address, i);
+          expect(response).to.be.ok;
+          const list = await contract.listByOwner(address);
+          expect(list).to.be.ok;
+          expect(list.length).to.be.equal(i + 1);
+        }
+        const list = await contract.listByOwner(address);
+
+        expect(list).to.be.ok;
+        expect(list.length).to.be.equal(args.numberOfCreatedNFTs);
+
+        for (const item of list) {
+          expect(item.metadata.reedemState).to.be.equal(0);
+          expect(item.creatorAddress.toLowerCase()).to.be.equal(
+            owner.address.toLowerCase()
+          );
+          expect(item.metadata.approvedMerchant.length).to.be.equal(
+            opts.metadata.approvedMerchant.length
+          );
+          expect(item.metadata.approvedPayment.length).to.be.equal(
+            opts.metadata.approvedPayment.length
+          );
+          expect(item.supply).to.be.equal(opts.supply);
+          expect(item.name).to.be.equal(opts.name);
+          expect(item.desc).to.be.equal(opts.desc);
+          expect(item.fieldId).to.be.equal(opts.fieldId);
         }
       });
     });
