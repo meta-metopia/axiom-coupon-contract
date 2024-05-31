@@ -1,0 +1,64 @@
+name: Generate code from ABI
+
+on:
+  workflow_call:
+    inputs:
+      should-upload-abi:
+        required: false
+        default: false
+        type: boolean
+      should-upload-sdk:
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  generate-java:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Compile ABI
+        run: pnpm compile
+      - name: Install Web3J
+        run: curl -L get.web3j.io | sh
+      - name: Generate Java code from NFT ABI
+        run: ~/.web3j/web3j generate solidity -a artifacts/abi/nft.abi.json -o artifacts/sdk/java -p com.axiom.network.nft
+      - name: Upload NFT ABI to release
+        if: ${{ inputs.should-upload-abi }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: artifacts/abi/nft.abi.json
+          asset_name: nft.abi.json
+          tag: ${{ github.ref }}
+          overwrite: true
+      - uses: shallwefootball/s3-upload-action@master
+        name: Upload abi to S3
+        if: ${{ inputs.should-upload-abi }}
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          endpoint: ${{ secrets.AWS_ENDPOINT }}
+          source_dir: "artifacts/abi"
+          destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/abi"
+      - uses: shallwefootball/s3-upload-action@master
+        name: Upload sdk to S3
+        if: ${{ inputs.should-upload-sdk }}
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          endpoint: ${{ secrets.AWS_ENDPOINT }}
+          source_dir: "artifacts/abi"
+          destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/abi"

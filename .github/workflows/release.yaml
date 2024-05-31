@@ -5,30 +5,5 @@ on:
       - released
 jobs:
   upload-abi:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: latest
-      - name: Install dependencies
-        run: pnpm install
-      - name: Compile ABI
-        run: pnpm compile
-      - name: Upload NFT ABI to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: artifacts/contracts/nft/Nft1155.sol/NFTContract.json
-          asset_name: NFTContract.abi.json
-          tag: ${{ github.ref }}
-          overwrite: true
-      - uses: shallwefootball/s3-upload-action@master
-        with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: ${{ secrets.AWS_BUCKET }}
-          endpoint: ${{ secrets.AWS_ENDPOINT }}
-          source_dir: "artifacts/contracts/nft/Nft1155.sol"
-          destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/contracts/nft/Nft1155.sol"
+    name: Generate release
+    uses: ./.github/workflows/generate-java.yaml
