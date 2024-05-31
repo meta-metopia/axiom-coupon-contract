@@ -33,6 +33,8 @@ jobs:
         run: curl -L get.web3j.io | sh
       - name: Generate Java code from NFT ABI
         run: ~/.web3j/web3j generate solidity -a artifacts/abi/nft.abi.json -o artifacts/sdk/java -p com.axiom.network.nft
+      - name: Zip sdk
+        run: mkdir -p artifacts/sdk/output && zip -r artifacts/sdk/output/sdk-java.zip artifacts/sdk/java
       - name: Upload NFT ABI to release
         if: ${{ inputs.should-upload-abi }}
         uses: svenstaro/upload-release-action@v2
@@ -60,5 +62,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           endpoint: ${{ secrets.AWS_ENDPOINT }}
-          source_dir: "artifacts/sdk"
+          source_dir: "artifacts/sdk/output"
           destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/sdk"
