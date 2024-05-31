@@ -87,6 +87,9 @@ contract NFTContract is
         for (uint256 i = 0; i < data.approvedPayment.length; i++) {
             _approvedPayment.push(data.approvedPayment[i]);
         }
+
+        _metadata.approvedMerchant = _approvedMerchant;
+        _metadata.approvedPayment = _approvedPayment;
     }
 
     /**
