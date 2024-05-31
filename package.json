@@ -8,7 +8,8 @@
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@openzeppelin/contracts": "^5.0.2",
-    "dayjs": "^1.11.11"
+    "dayjs": "^1.11.11",
+    "ethers": "^6.12.1"
   },
   "scripts": {
     "compile": "hardhat compile && python3 scripts/generate_abi.py",
