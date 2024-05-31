@@ -3,6 +3,9 @@ name: Test and Release
 on: push
 
 jobs:
+  codegen:
+    name: Codegen
+    uses: ./.github/workflows/generate-java.yaml
   test:
     runs-on: ubuntu-latest
     steps:

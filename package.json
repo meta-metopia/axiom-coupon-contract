@@ -11,7 +11,7 @@
     "dayjs": "^1.11.11"
   },
   "scripts": {
-    "compile": "hardhat compile",
+    "compile": "hardhat compile && python3 scripts/generate_abi.py",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js"
   }
