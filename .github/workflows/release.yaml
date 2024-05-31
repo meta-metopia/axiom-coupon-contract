@@ -7,3 +7,6 @@ jobs:
   upload-abi:
     name: Generate release
     uses: ./.github/workflows/generate-java.yaml
+    with:
+      should-upload-abi: true
+      should-upload-sdk: true
