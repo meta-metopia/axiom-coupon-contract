@@ -60,5 +60,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           endpoint: ${{ secrets.AWS_ENDPOINT }}
-          source_dir: "artifacts/abi"
-          destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/abi"
+          source_dir: "artifacts/sdk"
+          destination_dir: "artifacts/axiom-coupon-contract/${{ github.ref_name }}/sdk"
