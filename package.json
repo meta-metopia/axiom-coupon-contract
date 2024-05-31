@@ -7,8 +7,10 @@
   "dependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@nomicfoundation/hardhat-ignition": "^0.15.4",
     "@openzeppelin/contracts": "^5.0.2",
     "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
     "ethers": "^6.12.1",
     "nyc": "^15.1.0",
     "solidity-coverage": "^0.8.12"
@@ -17,6 +19,6 @@
     "compile": "hardhat compile && python3 scripts/generate_abi.py",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.js"
+    "deploy:contract": "hardhat ignition deploy ignition/modules/Factory.ts --network gemini"
   }
 }

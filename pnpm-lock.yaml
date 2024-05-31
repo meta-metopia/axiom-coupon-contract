@@ -14,12 +14,18 @@ importers:
       '@nomicfoundation/hardhat-ethers':
         specifier: ^3.0.6
         version: 3.0.6(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5))
+      '@nomicfoundation/hardhat-ignition':
+        specifier: ^0.15.4
+        version: 0.15.4(@nomicfoundation/hardhat-verify@2.0.7(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5))
       '@openzeppelin/contracts':
         specifier: ^5.0.2
         version: 5.0.2
       dayjs:
         specifier: ^1.11.11
         version: 1.11.11
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       ethers:
         specifier: ^6.12.1
         version: 6.12.1
@@ -1056,6 +1062,10 @@ packages:
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
+
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
 
   electron-to-chromium@1.4.787:
     resolution: {integrity: sha512-d0EFmtLPjctczO3LogReyM2pbBiiZbnsKnGF+cdZhsYzHm/A0GV7W94kqzLD8SN4O3f3iHlgLUChqghgyznvCQ==}
@@ -3773,6 +3783,8 @@ snapshots:
   dir-glob@3.0.1:
     dependencies:
       path-type: 4.0.0
+
+  dotenv@16.4.5: {}
 
   electron-to-chromium@1.4.787: {}
 

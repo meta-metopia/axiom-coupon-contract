@@ -1,86 +1,70 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-interface ICouponUtils {
-    function generateCouponToken(
-        uint8 contractAddressIndex,
-        uint8 contractAddressLength,
-        uint256 contractAddressValue,
-        uint8 tokenIdIndex,
-        uint8 tokenIdLength,
-        uint256 tokenIdValue
-    ) external pure returns (string memory);
+contract CouponFactory {
+    function getAddressLength(uint contractIndex) private pure returns (uint8) {
+        uint8 length = 0;
+        uint index = contractIndex;
 
-    function parseCouponToken(
-        string memory couponToken
-    )
-        external
-        pure
-        returns (
-            uint8 contractAddressIndex,
-            uint256 contractAddressValue,
-            uint8 tokenIdIndex,
-            uint256 tokenIdValue
-        );
-}
+        // Calculate the number of digits in the contractIndex
+        while (index != 0) {
+            index /= 10;
+            length++;
+        }
 
-contract CouponUtils is ICouponUtils {
+        // Handle the case when the index is 0
+        if (length == 0) {
+            length = 1;
+        }
+
+        return length;
+    }
+
+    /**
+     * Generate coupon token from contract address index and token ID index
+     */
     function generateCouponToken(
         uint8 contractAddressIndex, // Index of the contract address
-        uint8 contractAddressLength, // Length of the contract address value
-        uint256 contractAddressValue, // Value of the contract address
-        uint8 tokenIdIndex, // Index of the token ID
-        uint8 tokenIdLength, // Length of the token ID value
-        uint256 tokenIdValue // Value of the token ID
+        uint8 tokenIdIndex // Index of the token ID
     ) public pure returns (string memory) {
-        // Ensure lengths are correct
-        require(
-            contractAddressLength == 2,
-            "Contract address length must be 2"
-        );
-        require(tokenIdLength == 2, "Token ID length must be 2");
+        // contract address length is depents on the contract address index
+        // for example, if the contract address index is 1, then the contract address length is 1
+        // if the contract address index is 10, then the contract address length is 2
+        // if the contract address index is 100, then the contract address length is 3
+        uint8 contractAddressLength = getAddressLength(contractAddressIndex);
 
-        // Format the components into the coupon token
+        // tokenAddress length is depents on the token address index
+        // for example, if the token address index is 1, then the token address length is 1
+        // if the token address index is 10, then the token address length is 2
+        // if the token address index is 100, then the token address length is 3
+        uint8 tokenIdLength = getAddressLength(tokenIdIndex);
+
         return
             string(
                 abi.encodePacked(
-                    _toTwoDigitString(contractAddressIndex),
+                    _toTwoDigitString(1),
                     _toTwoDigitString(contractAddressLength),
-                    _toValueString(contractAddressValue),
-                    _toTwoDigitString(tokenIdIndex),
+                    _toValueString(contractAddressIndex, contractAddressLength),
+                    _toTwoDigitString(2),
                     _toTwoDigitString(tokenIdLength),
-                    _toValueString(tokenIdValue)
+                    _toValueString(0, tokenIdLength)
                 )
             );
     }
 
     function parseCouponToken(
         string memory couponToken
-    )
-        public
-        pure
-        returns (
-            uint8 contractAddressIndex,
-            uint256 contractAddressValue,
-            uint8 tokenIdIndex,
-            uint256 tokenIdValue
-        )
-    {
+    ) public pure returns (uint256 contractAddressIndex, uint256 tokenIdValue) {
         bytes memory tokenBytes = bytes(couponToken);
         require(tokenBytes.length >= 10, "Invalid coupon token length");
 
-        contractAddressIndex = _parseTwoDigitValue(tokenBytes, 0);
         uint8 contractAddressLength = _parseTwoDigitValue(tokenBytes, 2);
-        contractAddressValue = _parseValue(
+        contractAddressIndex = _parseValue(
             tokenBytes,
             4,
             contractAddressLength
         );
 
-        tokenIdIndex = _parseTwoDigitValue(
-            tokenBytes,
-            4 + contractAddressLength
-        );
         uint8 tokenIdLength = _parseTwoDigitValue(
             tokenBytes,
             6 + contractAddressLength
@@ -101,22 +85,18 @@ contract CouponUtils is ICouponUtils {
         return string(buffer);
     }
 
+    /**
+     * Generate a string from a value with a fixed length
+     * For example, if the value is 123 and the length is 5, then the output is "00123"
+     * If the value is 1 and the length is 3, then the output is "001"
+     */
     function _toValueString(
-        uint256 value
+        uint256 value,
+        uint8 withLength
     ) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0";
-        }
-        uint256 temp = value;
-        uint256 digits;
-        while (temp != 0) {
-            digits++;
-            temp /= 10;
-        }
-        bytes memory buffer = new bytes(digits);
-        while (value != 0) {
-            digits -= 1;
-            buffer[digits] = bytes1(uint8(48 + (value % 10)));
+        bytes memory buffer = new bytes(withLength);
+        for (uint8 i = 0; i < withLength; i++) {
+            buffer[withLength - i - 1] = bytes1(uint8(48 + (value % 10)));
             value /= 10;
         }
         return string(buffer);
