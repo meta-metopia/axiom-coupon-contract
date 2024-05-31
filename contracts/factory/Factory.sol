@@ -4,25 +4,30 @@ pragma solidity ^0.8.20;
 import "./IFactory.sol";
 import "./Coupon.sol";
 import "../nft/INftContract.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "../nft/Nft1155.sol";
 import "../access/WhiteListed.sol";
+import "./ICoupon.sol";
 
 contract NFTCouponFactory is INFTCouponFactory, Ownable, WhiteListed {
-    ICouponUtils private couponUtils;
+    /**
+     * Mapping of coupon contracts id to their address
+     */
+    mapping(string => address) private couponContracts;
+    address[] private initialOwners;
+
+    ICouponFactory private couponFactory;
 
     constructor(
-        address initialOwner,
         address[] memory _initialOwners
-    ) Ownable(initialOwner) WhiteListed(_initialOwners) {
-        couponUtils = new CouponUtils();
+    ) Ownable(msg.sender) WhiteListed(_initialOwners) {
+        approve(msg.sender);
+        initialOwners = _initialOwners;
     }
 
-    /**
-     * Set the coupon utils contract
-     */
-    function setCouponUtils(ICouponUtils _couponUtils) public onlyOwner {
-        couponUtils = _couponUtils;
+    function setICouponFactory(
+        ICouponFactory _couponFactory
+    ) external onlyOwner {
+        couponFactory = _couponFactory;
     }
 
     function createCoupon(
@@ -33,8 +38,10 @@ contract NFTCouponFactory is INFTCouponFactory, Ownable, WhiteListed {
         onlyWhileListedUsers
         returns (CreateCouponResponse memory response)
     {
-        // Generate the coupon token
-
+        NFTContract nftContract = new NFTContract(
+            createCouponOpts,
+            initialOwners
+        );
         return CreateCouponResponse("");
     }
 
