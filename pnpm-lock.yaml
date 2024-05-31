@@ -20,6 +20,9 @@ importers:
       dayjs:
         specifier: ^1.11.11
         version: 1.11.11
+      ethers:
+        specifier: ^6.12.1
+        version: 6.12.1
     devDependencies:
       '@nomicfoundation/hardhat-toolbox':
         specifier: ^5.0.0

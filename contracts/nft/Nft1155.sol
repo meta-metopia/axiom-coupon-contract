@@ -108,35 +108,27 @@ contract NFTContract is
     /**
      * Reedeem NFT using token Id. Only whitelisted users can redeem NFT
      */
-    function reedeem(
+    function redeem(
         uint256 id,
         RedeemCouponOpts memory _redeemCouponOpts
     ) external onlyWhileListedUsers {
-        address userAddress = address(
-            bytes20(bytes(_redeemCouponOpts.userAddress))
+        address userAddress = _redeemCouponOpts.userAddress;
+        require(
+            recoverSigner(
+                userAddress,
+                _redeemCouponOpts.userSignature,
+                _redeemCouponOpts.userMessage
+            ) == userAddress,
+            "40101: Invalid user signature"
         );
 
         require(
-            verify(
-                userAddress,
-                bytes(_redeemCouponOpts.userSignature),
-                _redeemCouponOpts.userMessage
-            ),
-            "Invalid signature"
+            balanceOf(userAddress, id) > 0,
+            "40004: User does not own the NFT"
         );
-
-        address user = recoverSigner(
-            getEthSignedMessageHash(
-                getMessageHash(_redeemCouponOpts.userMessage)
-            ),
-            bytes(_redeemCouponOpts.paymentSignature)
-        );
-
-        require(user == userAddress, "Invalid user signature");
-        require(balanceOf(user, id) > 0, "User does not own the NFT");
         require(
             _reedemState[id] == ReedemState.NOT_REDEEMED,
-            "NFT already redeemed"
+            "40005: NFT already redeemed"
         );
 
         _reedemState[id] = ReedemState.REDEEMED;

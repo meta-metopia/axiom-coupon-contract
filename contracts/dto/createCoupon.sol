@@ -5,7 +5,7 @@ pragma solidity ^0.8.20;
 import "./coupon.sol";
 
 struct CreateCouponOpts {
-    string creatorAddress; // Address of the issuer
+    address creatorAddress; // Address of the issuer
     string author; // Name of the issuer
     uint256 supply; // Number of coupons to be issued
     string name; // Name of the coupon

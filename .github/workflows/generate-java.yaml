@@ -32,7 +32,7 @@ jobs:
       - name: Install Web3J
         run: curl -L get.web3j.io | sh
       - name: Generate Java code from NFT ABI
-        run: ~/.web3j/web3j generate solidity -a artifacts/abi/nft.abi.json -o artifacts/sdk/java -p com.axiom.network.nft
+        run: ~/.web3j/web3j generate solidity -a artifacts/abi/factory.abi.json -o artifacts/sdk/java -p com.axiom.network.nft
       - name: Zip sdk
         run: mkdir -p artifacts/sdk/output && zip -r artifacts/sdk/output/sdk-java.zip artifacts/sdk/java
       - name: Upload NFT ABI to release
@@ -40,8 +40,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: artifacts/abi/nft.abi.json
-          asset_name: nft.abi.json
+          file: artifacts/abi/factory.abi.json
+          asset_name: factory.abi.json
           tag: ${{ github.ref }}
           overwrite: true
       - uses: shallwefootball/s3-upload-action@master

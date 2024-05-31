@@ -13,7 +13,7 @@ interface INFTContract {
     /**
      * Reedeem NFT using token Id. Only owner can redeem NFT
      */
-    function reedeem(
+    function redeem(
         uint256 id,
         RedeemCouponOpts memory redeemCouponOpts
     ) external;
