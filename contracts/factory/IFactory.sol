@@ -8,6 +8,11 @@ import "../dto/getCouponById.sol";
 import "../dto/redeemCoupon.sol";
 
 interface INFTCouponFactory {
+    /**
+     * Event emitted when a coupon is created
+     * @param nftIdBegin Begin coupon ID of the NFT
+     * @param contractAddress Address of the coupon contract
+     */
     event CouponCreated(string nftIdBegin, address contractAddress);
     /**
      * Event emitted when a coupon is transferred
@@ -19,6 +24,8 @@ interface INFTCouponFactory {
 
     /**
      * Event emitted when a coupon is redeemed
+     * @param couponId ID of the coupon
+     * @param trigger Who triggers the redemption
      */
     event CouponRedeemed(string couponId, address trigger);
 
