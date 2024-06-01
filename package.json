@@ -19,6 +19,7 @@
     "compile": "hardhat compile && python3 scripts/generate_abi.py",
     "coverage": "hardhat coverage",
     "test": "hardhat test",
-    "deploy:contract": "hardhat ignition deploy ignition/modules/Factory.ts --network gemini"
+    "deploy:contract": "hardhat run scripts/deploy.ts --network gemini",
+    "deploy:contract-test": "hardhat run scripts/deploy.ts --network hardhat"
   }
 }

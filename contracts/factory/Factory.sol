@@ -46,6 +46,39 @@ contract NFTCouponFactory is
         initialOwners.push(address(this));
     }
 
+    /**
+     * @dev Returns the number of available contracts
+     */
+    function getAvailableContractsCount() external view returns (uint256) {
+        return addedContractIndexCounter - createdContractIndexCounter;
+    }
+
+    /**
+     * @dev Returns the contract by index
+     */
+    function getContractByIndex(
+        uint256 index
+    ) external view returns (INFTContract) {
+        return addedContracts[index];
+    }
+
+    function isCouponIdValid(
+        string memory couponId
+    ) public view returns (bool) {
+        (
+            uint256 _contractAddressIndex,
+            uint256 _tokenIdValue
+        ) = parseCouponToken(couponId);
+        INFTContract nftContract = addedContracts[_contractAddressIndex];
+        address contractAddress = address(nftContract);
+
+        uint256 totalSupply = nftContract.totalSupply();
+
+        return
+            address(contractAddress) != address(0) &&
+            _tokenIdValue < totalSupply;
+    }
+
     function addContract(INFTContract _contract) external onlyOwner {
         addedContracts[addedContractIndexCounter] = _contract;
         addedContractIndexCounter++;
