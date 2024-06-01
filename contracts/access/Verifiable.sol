@@ -9,7 +9,6 @@ contract MessageVerifiable {
     using ECDSA for bytes32;
 
     function recoverSigner(
-        address _signer,
         bytes memory _signature,
         string memory _message
     ) public pure returns (address) {

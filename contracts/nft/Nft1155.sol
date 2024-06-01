@@ -22,6 +22,7 @@ contract NFTContract is
     ApprovedPayment[] private _approvedPayment;
     uint256 private _supply;
     uint256 private _currentSupply;
+    bool private _isInitialized = false;
 
     mapping(uint256 => ReedemState) private _reedemState;
     mapping(address => uint256[]) private _ownedNFTs;
@@ -36,19 +37,30 @@ contract NFTContract is
     string private _name;
     string private _desc;
 
+    modifier onlyInitialized() {
+        require(_isInitialized, "40000: Contract not initialized");
+        _;
+    }
+
     /**
      * Constructor to create a new NFT
-     * @param _createCouponOpts - CreateCouponOpts
      * @param _initialOwners - Initial owners of the NFT
      */
     constructor(
-        CreateCouponOpts memory _createCouponOpts,
         address[] memory _initialOwners
-    )
-        Ownable(msg.sender)
-        ERC1155(_createCouponOpts.metadata.url)
-        WhiteListed(_initialOwners)
-    {
+    ) Ownable(msg.sender) ERC1155("") WhiteListed(_initialOwners) {
+        approve(msg.sender);
+    }
+
+    function initialize(
+        CreateCouponOpts memory _createCouponOpts,
+        address[] memory _additionalOwners
+    ) external onlyWhileListedUsers {
+        for (uint256 i = 0; i < _additionalOwners.length; i++) {
+            approve(_additionalOwners[i]);
+        }
+        _isInitialized = true;
+        _setURI(_createCouponOpts.metadata.url);
         initializeMetadata(_createCouponOpts.metadata);
         _creatorAddress = msg.sender;
         _author = _createCouponOpts.author;
@@ -62,7 +74,7 @@ contract NFTContract is
         _currentSupply = 0;
     }
 
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view onlyInitialized returns (uint256) {
         return _supply;
     }
 
@@ -95,7 +107,10 @@ contract NFTContract is
     /**
      * Mint a new NFT to the user with the given id
      */
-    function mint(address to, uint256 id) external onlyWhileListedUsers {
+    function mint(
+        address to,
+        uint256 id
+    ) external onlyWhileListedUsers onlyInitialized {
         require(_currentSupply < _supply, "40001: Supply limit reached");
         require(_owners[id] == address(0), "40002: NFT already minted");
         require(id < _supply, "40003: Id is greater than supply limit");
@@ -114,11 +129,10 @@ contract NFTContract is
     function redeem(
         uint256 id,
         RedeemCouponOpts memory _redeemCouponOpts
-    ) external onlyWhileListedUsers {
+    ) external onlyWhileListedUsers onlyInitialized {
         address userAddress = _redeemCouponOpts.userAddress;
         require(
             recoverSigner(
-                userAddress,
                 _redeemCouponOpts.userSignature,
                 _redeemCouponOpts.userMessage
             ) == userAddress,
@@ -139,7 +153,7 @@ contract NFTContract is
 
     function listByOwner(
         address owner
-    ) external view returns (GetTokenByIdResponse[] memory) {
+    ) external view onlyInitialized returns (GetTokenByIdResponse[] memory) {
         uint256[] memory nfts = _ownedNFTs[owner];
         GetTokenByIdResponse[] memory response = new GetTokenByIdResponse[](
             nfts.length
@@ -169,7 +183,7 @@ contract NFTContract is
 
     function getById(
         uint256 id
-    ) external view returns (GetTokenByIdResponse memory) {
+    ) external view onlyInitialized returns (GetTokenByIdResponse memory) {
         address owner = _owners[id];
         uint256 mintTime = _mintTime[id];
 
