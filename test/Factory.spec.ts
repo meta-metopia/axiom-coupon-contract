@@ -13,32 +13,127 @@ interface TestCase<Arg> {
 
 describe("Factory", () => {
   describe("createCoupon", () => {
-    interface Arg {
-      deployer(): Promise<any>;
-      creator(): Promise<any>;
-      initialOwners(): Promise<any[]>;
-      opts: CreateCouponOptsStruct;
-      expectedCouponId?: string;
-      expectedRevert?: string;
-    }
+    describe("single create", () => {
+      interface Arg {
+        deployer(): Promise<any>;
+        creator(): Promise<any>;
+        initialOwners(): Promise<any[]>;
+        opts: CreateCouponOptsStruct;
+        expectedCouponId?: string;
+        expectedRevert?: string;
+      }
 
-    const testCases: TestCase<Arg>[] = [
-      {
-        name: "should be able to create coupon",
-        args: {
-          deployer: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return owner;
+      const testCases: TestCase<Arg>[] = [
+        {
+          name: "should be able to create coupon",
+          args: {
+            deployer: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner;
+            },
+            creator: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner;
+            },
+            initialOwners: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return [owner];
+            },
+            opts: {
+              creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
+              author: "a",
+              supply: 10,
+              name: "Hello",
+              desc: "World",
+              fieldId: "1",
+              price: "10",
+              currency: "cny",
+              metadata: {
+                approvedMerchant: [],
+                approvedPayment: [],
+                couponType: "1",
+                couponSubtitle: "subtitle",
+                couponDetails: "",
+                url: "https://google.com",
+                expirationTime: 0,
+                expirationStartTime: 0,
+                rule: {
+                  value: 1,
+                  claimLimit: 1,
+                  isTransfer: false,
+                },
+                reedemState: 0,
+                approveTime: 0,
+                approveDuration: 0,
+              },
+            },
+            expectedCouponId: "01010020200",
           },
-          creator: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return owner;
+        },
+      ];
+
+      testCases.forEach(({ name, args }) => {
+        it(name, async () => {
+          const { creator, initialOwners, opts, expectedCouponId } = args;
+
+          const creatorSigner = await creator();
+          const initialOwnerSigners = await initialOwners();
+
+          const FactoryContract = await hre.ethers.getContractFactory(
+            "NFTCouponFactory"
+          );
+
+          const NftContract = await hre.ethers.getContractFactory(
+            "NFTContract"
+          );
+
+          const nftContract = await NftContract.deploy([]);
+          await nftContract.waitForDeployment();
+
+          const factory = await FactoryContract.deploy(
+            initialOwnerSigners.map((signer) => signer.address)
+          );
+          await factory.waitForDeployment();
+
+          await nftContract.approve(await factory.getAddress());
+          await factory.addContract(nftContract);
+
+          const response = await factory
+            .connect(creatorSigner)
+            .createCoupon(opts);
+          const result = await response.wait();
+          expect(response).to.be.ok;
+
+          const couponCreatedEvent = result?.logs[0] as any;
+          expect(couponCreatedEvent.args[0]).to.equal(expectedCouponId);
+        });
+      });
+    });
+
+    describe("multiple create", () => {
+      interface Arg {
+        createNumber: number;
+      }
+
+      const testCases: TestCase<Arg>[] = [
+        {
+          name: "should be able to create multiple coupons",
+          args: {
+            createNumber: 3,
           },
-          initialOwners: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return [owner];
-          },
-          opts: {
+        },
+      ];
+
+      testCases.forEach(({ name, args }) => {
+        it(name, async () => {
+          const FactoryContract = await hre.ethers.getContractFactory(
+            "NFTCouponFactory"
+          );
+
+          const factory = await FactoryContract.deploy([]);
+          await factory.waitForDeployment();
+
+          const createOpts = {
             creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
             author: "a",
             supply: 10,
@@ -65,44 +160,23 @@ describe("Factory", () => {
               approveTime: 0,
               approveDuration: 0,
             },
-          },
-          expectedCouponId: "01010020200",
-        },
-      },
-    ];
+          };
+          // simulates add multiple nft contracts
+          for (let i = 0; i < args.createNumber; i++) {
+            const NftContract = await hre.ethers.getContractFactory(
+              "NFTContract"
+            );
+            const nft = await NftContract.deploy([]);
+            await nft.waitForDeployment();
+            await nft.approve(await factory.getAddress());
+            await factory.addContract(nft);
+          }
 
-    testCases.forEach(({ name, args }) => {
-      it(name, async () => {
-        const { creator, initialOwners, opts, expectedCouponId } = args;
-
-        const creatorSigner = await creator();
-        const initialOwnerSigners = await initialOwners();
-
-        const FactoryContract = await hre.ethers.getContractFactory(
-          "NFTCouponFactory"
-        );
-
-        const NftContract = await hre.ethers.getContractFactory("NFTContract");
-
-        const nftContract = await NftContract.deploy([]);
-        await nftContract.waitForDeployment();
-
-        const factory = await FactoryContract.deploy(
-          initialOwnerSigners.map((signer) => signer.address)
-        );
-        await factory.waitForDeployment();
-
-        await nftContract.approve(await factory.getAddress());
-        await factory.addContract(nftContract);
-
-        const response = await factory
-          .connect(creatorSigner)
-          .createCoupon(opts);
-        const result = await response.wait();
-        expect(response).to.be.ok;
-
-        const couponCreatedEvent = result?.logs[0] as any;
-        expect(couponCreatedEvent.args[0]).to.equal(expectedCouponId);
+          for (let i = 0; i < args.createNumber; i++) {
+            const response = await factory.createCoupon(createOpts);
+            expect(response).to.be.ok;
+          }
+        });
       });
     });
   });
@@ -468,7 +542,7 @@ describe("Factory", () => {
     });
   });
 
-  describe.only("listByOwner", () => {
+  describe("listByOwner", () => {
     interface Arg {
       userAddress: () => Promise<string>;
       expectedNumber: number;
