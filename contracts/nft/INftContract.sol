@@ -6,6 +6,8 @@ import "../dto/redeemCoupon.sol";
 import "../dto/createCoupon.sol";
 
 interface INFTContract {
+    function totalSupply() external view returns (uint256);
+
     /**
      * Transfer tokens from one address to another
      */
