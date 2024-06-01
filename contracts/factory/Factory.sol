@@ -26,6 +26,11 @@ contract NFTCouponFactory is
      */
     mapping(uint256 => INFTContract) private addedContracts;
 
+    /**
+     * Mapping of user address to the number of contracts owned by the user
+     */
+    mapping(address => uint) private userOwnedContractsCount;
+
     uint256 private createdContractIndexCounter = 0;
     uint256 private addedContractIndexCounter = 0;
 
@@ -91,6 +96,7 @@ contract NFTCouponFactory is
         );
 
         nftContract.mint(transferCouponOptions.receiverAddr, _tokenIdValue);
+        userOwnedContractsCount[transferCouponOptions.receiverAddr]++;
         emit CouponTransferred(
             transferCouponOptions.couponId,
             msg.sender,
@@ -100,8 +106,12 @@ contract NFTCouponFactory is
 
     function listAllCoupons(
         ListAllCouponsOpts memory listAllCouponsOpts
-    ) external view override returns (GetCouponByIdResponse[] memory items) {
+    ) external view override returns (GetCouponByIdResponse[] memory) {
         uint256 totalItems = 0;
+        uint256 size = userOwnedContractsCount[listAllCouponsOpts.userAddress];
+        GetCouponByIdResponse[] memory items = new GetCouponByIdResponse[](
+            size
+        );
 
         for (uint256 i = 0; i < createdContractIndexCounter; i++) {
             INFTContract nftContract = couponContracts[i];
@@ -118,7 +128,10 @@ contract NFTCouponFactory is
             for (uint256 j = 0; j < response.length; j++) {
                 GetTokenByIdResponse memory token = response[j];
 
-                string memory couponId = generateCouponToken(i, token.couponId);
+                string memory couponId = generateCouponToken(
+                    i,
+                    nftContract.totalSupply()
+                );
                 GetCouponByIdResponse memory item = GetCouponByIdResponse(
                     couponId,
                     token.creatorAddress,
@@ -137,6 +150,8 @@ contract NFTCouponFactory is
                 totalItems++;
             }
         }
+
+        return items;
     }
 
     function getCouponById(
