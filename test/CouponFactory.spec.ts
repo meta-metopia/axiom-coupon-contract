@@ -73,6 +73,7 @@ describe("CouponFactory", () => {
         const CouponFactory = await hre.ethers.getContractFactory(
           "CouponFactory"
         );
+
         const coupon = await CouponFactory.deploy();
         await coupon.waitForDeployment();
 

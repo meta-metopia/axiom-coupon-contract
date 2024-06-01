@@ -24,8 +24,8 @@ contract CouponFactory {
      * Generate coupon token from contract address index and token ID index
      */
     function generateCouponToken(
-        uint8 contractAddressIndex, // Index of the contract address
-        uint8 tokenIdIndex // Index of the token ID
+        uint256 contractAddressIndex, // Index of the contract address
+        uint256 tokenIdIndex // Index of the token ID
     ) public pure returns (string memory) {
         // contract address length is depents on the contract address index
         // for example, if the contract address index is 1, then the contract address length is 1

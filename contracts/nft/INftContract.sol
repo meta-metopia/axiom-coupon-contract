@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import "../dto/getCouponById.sol";
 import "../dto/redeemCoupon.sol";
+import "../dto/createCoupon.sol";
 
 interface INFTContract {
     /**
@@ -31,4 +32,14 @@ interface INFTContract {
     function getById(
         uint256 id
     ) external view returns (GetTokenByIdResponse memory);
+
+    /**
+     * Initialize the NFT contract with the given options
+     * @param _createCouponOpts CreateCouponOpts
+     * @param _additionalOwners  Additional owners of the NFT
+     */
+    function initialize(
+        CreateCouponOpts memory _createCouponOpts,
+        address[] memory _additionalOwners
+    ) external;
 }
