@@ -63,7 +63,7 @@ describe("Factory", () => {
                   claimLimit: 1,
                   isTransfer: false,
                 },
-                reedemState: 0,
+                redeemState: 0,
                 approveTime: 0,
                 approveDuration: 0,
               },
@@ -157,7 +157,7 @@ describe("Factory", () => {
                 claimLimit: 1,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -237,7 +237,7 @@ describe("Factory", () => {
                 claimLimit: 1,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -288,7 +288,7 @@ describe("Factory", () => {
                 claimLimit: 1,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -340,7 +340,7 @@ describe("Factory", () => {
                 claimLimit: 1,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -463,7 +463,7 @@ describe("Factory", () => {
                 claimLimit: 1,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -608,7 +608,7 @@ describe("Factory", () => {
               claimLimit: 1,
               isTransfer: false,
             },
-            reedemState: 0,
+            redeemState: 0,
             approveTime: 0,
             approveDuration: 0,
           },
@@ -648,7 +648,7 @@ describe("Factory", () => {
     });
   });
 
-  describe.only("getNftAddressByCouponId", () => {
+  describe("getNftAddressByCouponId", () => {
     it("should be able to get contract by coupon id", async () => {
       const [owner, user1, user2] = await hre.ethers.getSigners();
       const FactoryContract = await hre.ethers.getContractFactory(
@@ -678,7 +678,7 @@ describe("Factory", () => {
             claimLimit: 1,
             isTransfer: true,
           },
-          reedemState: 0,
+          redeemState: 0,
           approveTime: 0,
           approveDuration: 0,
         },

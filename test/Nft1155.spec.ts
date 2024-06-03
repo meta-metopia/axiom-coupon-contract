@@ -65,7 +65,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -111,7 +111,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -200,7 +200,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -258,7 +258,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -317,7 +317,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -375,7 +375,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -433,7 +433,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -558,7 +558,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -640,7 +640,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -723,7 +723,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -760,7 +760,7 @@ describe("Nft1155", () => {
           expect(response).to.be.ok;
 
           const nft = await contract.getById(tokenId);
-          expect(nft.metadata.reedemState).to.be.equal(args.expectStatus);
+          expect(nft.metadata.redeemState).to.be.equal(args.expectStatus);
         }
       });
     });
@@ -846,7 +846,7 @@ describe("Nft1155", () => {
               claimLimit: 0,
               isTransfer: false,
             },
-            reedemState: 0,
+            redeemState: 0,
             approveTime: 0,
             approveDuration: 0,
           },
@@ -871,7 +871,7 @@ describe("Nft1155", () => {
         expect(list.length).to.be.equal(args.numberOfCreatedNFTs);
 
         for (const item of list) {
-          expect(item.metadata.reedemState).to.be.equal(0);
+          expect(item.metadata.redeemState).to.be.equal(0);
           expect(item.creatorAddress.toLowerCase()).to.be.equal(
             owner.address.toLowerCase()
           );
@@ -953,7 +953,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -1012,7 +1012,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -1070,7 +1070,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: true,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -1173,7 +1173,7 @@ describe("Nft1155", () => {
                 claimLimit: 0,
                 isTransfer: false,
               },
-              reedemState: 0,
+              redeemState: 0,
               approveTime: 0,
               approveDuration: 0,
             },
@@ -1195,7 +1195,7 @@ describe("Nft1155", () => {
 
           for (const id of args.expectIds) {
             const item = await contract.getById(id);
-            expect(item.metadata.reedemState).to.be.equal(0);
+            expect(item.metadata.redeemState).to.be.equal(0);
             expect(item.creatorAddress.toLowerCase()).to.be.equal(
               owner.address.toLowerCase()
             );
@@ -1254,7 +1254,7 @@ describe("Nft1155", () => {
               claimLimit: 0,
               isTransfer: false,
             },
-            reedemState: 0,
+            redeemState: 0,
             approveTime: 0,
             approveDuration: 0,
           },

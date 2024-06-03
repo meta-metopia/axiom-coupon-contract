@@ -24,7 +24,7 @@ contract NFTContract is
     uint256 private _currentSupply;
     bool private _isInitialized = false;
 
-    mapping(uint256 => ReedemState) private _reedemState;
+    mapping(uint256 => RedeemState) private _reedemState;
     mapping(address => uint256[]) private _ownedNFTs;
     mapping(uint256 => uint256) private _mintTime;
     mapping(uint256 => address) private _owners;
@@ -84,7 +84,7 @@ contract NFTContract is
             "40004: User does not own the NFT"
         );
         require(
-            _reedemState[id] == ReedemState.NOT_REDEEMED,
+            _reedemState[id] == RedeemState.NOT_REDEEMED,
             "40005: NFT already redeemed"
         );
 
@@ -153,7 +153,7 @@ contract NFTContract is
         require(id < _supply, "40003: Id is greater than supply limit");
 
         _mint(to, id, 1, "");
-        _reedemState[id] = ReedemState.NOT_REDEEMED;
+        _reedemState[id] = RedeemState.NOT_REDEEMED;
         _ownedNFTs[to].push(id);
         _mintTime[id] = block.timestamp;
         _owners[id] = to;
@@ -181,11 +181,11 @@ contract NFTContract is
             "40004: User does not own the NFT"
         );
         require(
-            _reedemState[id] == ReedemState.NOT_REDEEMED,
+            _reedemState[id] == RedeemState.NOT_REDEEMED,
             "40005: NFT already redeemed"
         );
 
-        _reedemState[id] = ReedemState.REDEEMED;
+        _reedemState[id] = RedeemState.REDEEMED;
     }
 
     function listByOwner(
