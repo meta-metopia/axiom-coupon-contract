@@ -1,4 +1,5 @@
 import hre from "hardhat";
+import { NFTContract } from "../typechain-types";
 
 async function deployFactoryWithContracts(num: number) {
   const factory = await hre.ethers.getContractFactory("NFTCouponFactory");
@@ -34,8 +35,15 @@ async function deployFactoryWithContracts(num: number) {
 
   return await nftCouponFactory.getAddress();
 }
+async function addApprovedUser(contract: string, address: string) {
+  const factory = await hre.ethers.getContractFactory("NFTCouponFactory");
+  const nftCouponFactory = factory.attach(contract) as NFTContract;
+
+  await nftCouponFactory.approve(address);
+  console.log("User added to approved list");
+}
 
 (async () => {
-  const numberOfPredefinedContracts = 10;
-  await deployFactoryWithContracts(numberOfPredefinedContracts);
+    const numberOfPredefinedContracts = 10;
+    await deployFactoryWithContracts(numberOfPredefinedContracts);
 })();

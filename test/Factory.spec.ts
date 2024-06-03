@@ -2,6 +2,7 @@ import { expect } from "chai";
 import hre from "hardhat";
 import {
   CreateCouponOptsStruct,
+  NFTContract,
   RedeemCouponOptsStruct,
 } from "../typechain-types/contracts/nft/Nft1155.sol/NFTContract";
 import { ListAllCouponsOptsStruct } from "../typechain-types/factory/Factory.sol/NFTCouponFactory";
@@ -181,14 +182,14 @@ describe("Factory", () => {
     });
   });
 
-  describe("transferCoupon", () => {
+  describe("mintCoupon (mint)", () => {
     interface Arg {
       creator(): Promise<any>;
       initialOwners(): Promise<any[]>;
       transferSender(): Promise<any>;
       receiver(): Promise<any>;
       opts: CreateCouponOptsStruct;
-      transferCouponId: string;
+      mintCouponId: string;
       expectedCouponId?: string;
       expectedRevert?: string;
     }
@@ -242,7 +243,7 @@ describe("Factory", () => {
             },
           },
           expectedCouponId: "01010020200",
-          transferCouponId: "01010020200",
+          mintCouponId: "01010020200",
         },
       },
       {
@@ -294,7 +295,7 @@ describe("Factory", () => {
           },
           expectedRevert:
             "40401: NFT contract for the given coupon id not found",
-          transferCouponId: "01011020201",
+          mintCouponId: "01011020201",
         },
       },
       {
@@ -346,20 +347,15 @@ describe("Factory", () => {
           },
           expectedRevert:
             "40301: Only whitelisted users can call this function",
-          transferCouponId: "01010020201",
+          mintCouponId: "01010020201",
         },
       },
     ];
 
     testCases.forEach(({ name, args }) => {
       it(name, async () => {
-        const {
-          creator,
-          initialOwners,
-          opts,
-          expectedCouponId,
-          transferCouponId,
-        } = args;
+        const { creator, initialOwners, opts, expectedCouponId, mintCouponId } =
+          args;
         const creatorSigner = await creator();
         const transferSenderSigner = await args.transferSender();
         const initialOwnerSigners = await initialOwners();
@@ -387,8 +383,8 @@ describe("Factory", () => {
 
         if (args.expectedRevert) {
           await expect(
-            factory.connect(creatorSigner).transferCoupon({
-              couponId: transferCouponId,
+            factory.connect(creatorSigner).mintCoupon({
+              couponId: mintCouponId,
               receiverAddr: receiverSigner.address,
             })
           ).to.be.revertedWith(args.expectedRevert);
@@ -397,8 +393,8 @@ describe("Factory", () => {
 
         const responseTransfer = await factory
           .connect(creatorSigner)
-          .transferCoupon({
-            couponId: transferCouponId,
+          .mintCoupon({
+            couponId: mintCouponId,
             receiverAddr: receiverSigner.address,
           });
         const resultTransfer = await responseTransfer.wait();
@@ -509,7 +505,7 @@ describe("Factory", () => {
         await factory.addContract(nft);
 
         await factory.connect(transferSenderSigner).createCoupon(opts);
-        await factory.connect(creatorSigner).transferCoupon({
+        await factory.connect(creatorSigner).mintCoupon({
           couponId: redeemCouponId,
           receiverAddr: receiverSigner.address,
         });
@@ -632,7 +628,7 @@ describe("Factory", () => {
           await factory.addContract(nft);
 
           await factory.createCoupon(createOpts);
-          await factory.transferCoupon({
+          await factory.mintCoupon({
             couponId: `0101${i}020200`,
             receiverAddr: await userAddress(),
           });
@@ -649,6 +645,83 @@ describe("Factory", () => {
           expect(response[i].couponId).to.equal(`0101${i}020200`);
         }
       });
+    });
+  });
+
+  describe.only("getNftAddressByCouponId", () => {
+    it("should be able to get contract by coupon id", async () => {
+      const [owner, user1, user2] = await hre.ethers.getSigners();
+      const FactoryContract = await hre.ethers.getContractFactory(
+        "NFTCouponFactory"
+      );
+
+      const createOpts = {
+        creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
+        author: "a",
+        supply: 10,
+        name: "Hello",
+        desc: "World",
+        fieldId: "1",
+        price: "10",
+        currency: "cny",
+        metadata: {
+          approvedMerchant: [],
+          approvedPayment: [],
+          couponType: "1",
+          couponSubtitle: "subtitle",
+          couponDetails: "",
+          url: "https://google.com",
+          expirationTime: 0,
+          expirationStartTime: 0,
+          rule: {
+            value: 1,
+            claimLimit: 1,
+            isTransfer: true,
+          },
+          reedemState: 0,
+          approveTime: 0,
+          approveDuration: 0,
+        },
+      };
+
+      const factory = await FactoryContract.deploy([]);
+      await factory.waitForDeployment();
+
+      const NftContract = await hre.ethers.getContractFactory("NFTContract");
+      const nft = await NftContract.deploy([]);
+      await nft.waitForDeployment();
+
+      await nft.approve(await factory.getAddress());
+      await factory.addContract(nft);
+
+      // create one coupon
+      await factory.createCoupon(createOpts);
+      // mint a coupon and send to user1
+      await factory.mintCoupon({
+        couponId: `0101002010`,
+        receiverAddr: user1.address,
+      });
+
+      // use factory to get nft address by coupon id
+      // response contains nft address and token id
+      const response = await factory.getNftAddressByCouponId(`0101002010`);
+      // create the nft contract from the address
+      const nftFromAddress = nft.attach(response.nftAddress) as NFTContract;
+      // get the nft detail by token id
+      const nftDetail = await nftFromAddress.getById(response.tokenId);
+      expect(nftDetail.couponId).to.equal(response.tokenId);
+
+      // transfer the nft to user2 on behalf of user1
+      await nftFromAddress
+        .connect(user1)
+        .transfer(user2.address, response.tokenId);
+
+      // check if user2 has the nft
+      const user2Balance = await nftFromAddress.balanceOf(
+        user2.address,
+        response.tokenId
+      );
+      expect(user2Balance).to.equal(1);
     });
   });
 });

@@ -78,6 +78,37 @@ contract NFTContract is
         return _supply;
     }
 
+    function transfer(address to, uint256 id) external onlyInitialized {
+        require(
+            balanceOf(msg.sender, id) > 0,
+            "40004: User does not own the NFT"
+        );
+        require(
+            _reedemState[id] == ReedemState.NOT_REDEEMED,
+            "40005: NFT already redeemed"
+        );
+
+        require(_owners[id] == msg.sender, "40006: User is not the owner and cannot transfer the NFT on behalf of the owner");
+
+        require(_metadata.rule.isTransfer, "40007: Transfer not allowed due to rule restrictions");
+
+        safeTransferFrom(msg.sender, to, id, 1, "");
+        _ownedNFTs[to].push(id);
+        _ownedNFTs[msg.sender].push(id);
+        _owners[id] = to;
+
+        // remove owned NFT from the sender
+        uint256[] memory ownedNFTs = _ownedNFTs[msg.sender];
+        uint256[] memory newOwnedNFTs = new uint256[](ownedNFTs.length - 1);
+        uint256 index = 0;
+        for (uint256 i = 0; i < ownedNFTs.length; i++) {
+            if (ownedNFTs[i] != id) {
+                newOwnedNFTs[index] = ownedNFTs[i];
+                index++;
+            }
+        }
+    }
+
     /**
      * Initialize metadata for the NFT
      */

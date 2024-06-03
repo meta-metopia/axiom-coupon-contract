@@ -9,9 +9,14 @@ interface INFTContract {
     function totalSupply() external view returns (uint256);
 
     /**
-     * Transfer tokens from one address to another
+     * Mint tokens from one address to another
      */
     function mint(address to, uint256 id) external;
+
+    /**
+     * Transfer NFT to another address
+     */
+    function transfer(address to, uint256 id) external;
 
     /**
      * Reedeem NFT using token Id. Only owner can redeem NFT
