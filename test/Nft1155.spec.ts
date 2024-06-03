@@ -889,4 +889,223 @@ describe("Nft1155", () => {
       });
     });
   });
+
+  describe("Transfer", () => {
+    interface Args {
+      opts: CreateCouponOptsStruct;
+      mintTo: () => Promise<[string, number]>;
+      transferSender: () => Promise<any>;
+      transferTo: () => Promise<string>;
+      expectRevertMessage?: string;
+      expectBalance?: number;
+    }
+
+    const testCases: TestCase<Args>[] = [
+      {
+        name: "should not be able to transfer a token when the token is not transferable",
+        args: {
+          mintTo: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [address1.address, 1];
+          },
+          transferSender: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return address1;
+          },
+          transferTo: async () => {
+            const [owner, address1, address2] = await hre.ethers.getSigners();
+            return address2.address;
+          },
+          expectRevertMessage:
+            "40007: Transfer not allowed due to rule restrictions",
+          opts: {
+            creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+            author: "hello",
+            supply: 10,
+            name: "test",
+            desc: "test desc",
+            fieldId: "1",
+            price: "10",
+            currency: "CNY",
+            metadata: {
+              approvedMerchant: [
+                {
+                  approvedMerchantName: "test",
+                  approvedMerchantAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              approvedPayment: [
+                {
+                  approvedPaymentName: "test",
+                  approvedPaymentAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              couponType: "1",
+              couponSubtitle: "Subtitle",
+              couponDetails: "Some",
+              url: "https://www.google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 0,
+                claimLimit: 0,
+                isTransfer: false,
+              },
+              reedemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          },
+        },
+      },
+      {
+        name: "should not be able to transfer token when user is not the owner",
+        args: {
+          mintTo: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [address1.address, 1];
+          },
+          transferSender: async () => {
+            const [owner, address1, address2, address3] =
+              await hre.ethers.getSigners();
+            return address3;
+          },
+          transferTo: async () => {
+            const [owner, address1, address2] = await hre.ethers.getSigners();
+            return address2.address;
+          },
+          expectRevertMessage: "40004: User does not own the NFT",
+          opts: {
+            creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+            author: "hello",
+            supply: 10,
+            name: "test",
+            desc: "test desc",
+            fieldId: "1",
+            price: "10",
+            currency: "CNY",
+            metadata: {
+              approvedMerchant: [
+                {
+                  approvedMerchantName: "test",
+                  approvedMerchantAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              approvedPayment: [
+                {
+                  approvedPaymentName: "test",
+                  approvedPaymentAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              couponType: "1",
+              couponSubtitle: "Subtitle",
+              couponDetails: "Some",
+              url: "https://www.google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 0,
+                claimLimit: 0,
+                isTransfer: false,
+              },
+              reedemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          },
+        },
+      },
+      {
+        name: "should be able to transfer token when user is the owner",
+        args: {
+          mintTo: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return [address1.address, 1];
+          },
+          transferSender: async () => {
+            const [owner, address1] = await hre.ethers.getSigners();
+            return address1;
+          },
+          transferTo: async () => {
+            const [owner, address1, address2] = await hre.ethers.getSigners();
+            return address2.address;
+          },
+          expectBalance: 1,
+          opts: {
+            creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+            author: "hello",
+            supply: 10,
+            name: "test",
+            desc: "test desc",
+            fieldId: "1",
+            price: "10",
+            currency: "CNY",
+            metadata: {
+              approvedMerchant: [
+                {
+                  approvedMerchantName: "test",
+                  approvedMerchantAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              approvedPayment: [
+                {
+                  approvedPaymentName: "test",
+                  approvedPaymentAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              couponType: "1",
+              couponSubtitle: "Subtitle",
+              couponDetails: "Some",
+              url: "https://www.google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 0,
+                claimLimit: 0,
+                isTransfer: true,
+              },
+              reedemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          },
+        },
+      },
+    ];
+
+    testCases.forEach(({ name, args }) => {
+      it(name, async () => {
+        const nft = await hre.ethers.getContractFactory("NFTContract");
+
+        const contract = await nft.deploy([]);
+        await contract.initialize(args.opts, []);
+
+        const [mintToAddress, tokenId] = await args.mintTo();
+
+        const response = await contract.mint(mintToAddress, tokenId);
+        expect(response).to.be.ok;
+
+        const sender = await args.transferSender();
+        const to = await args.transferTo();
+
+        if (args.expectRevertMessage) {
+          await expect(
+            contract.connect(sender).transfer(to, tokenId)
+          ).to.be.revertedWith(args.expectRevertMessage);
+        } else {
+          const response = await contract.connect(sender).transfer(to, tokenId);
+          expect(response).to.be.ok;
+          expect(await contract.balanceOf(to, tokenId)).to.be.equal(
+            args.expectBalance
+          );
+        }
+      });
+    });
+  });
 });
