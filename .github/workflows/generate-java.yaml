@@ -42,8 +42,17 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: artifacts/abi/factory.abi.json
-          asset_name: factory.abi.json
+          file: artifacts/abi/factory.json
+          asset_name: factory.json
+          tag: ${{ github.ref }}
+          overwrite: true
+      - name: Upload NFT ABI to release
+        if: ${{ inputs.should-upload-abi }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: artifacts/abi/nft.json
+          asset_name: nft.json
           tag: ${{ github.ref }}
           overwrite: true
       - uses: shallwefootball/s3-upload-action@master
