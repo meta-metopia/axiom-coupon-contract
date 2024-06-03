@@ -17,7 +17,7 @@ struct ApprovedPayment {
     string approvedPaymentName; // Name of the payment channel
 }
 
-enum ReedemState {
+enum RedeemState {
     REDEEMED,
     NOT_REDEEMED
 }
@@ -32,7 +32,7 @@ struct Metadata {
     uint256 expirationTime; // Expiration time of the coupon
     uint256 expirationStartTime; // Start time of the coupon validity
     Rule rule; // Redemption rules
-    ReedemState reedemState; // State of the coupon
+    RedeemState redeemState; // State of the coupon
     uint256 approveTime; // Time when the coupon was approved
     uint256 approveDuration; // Duration of the approval
 }
