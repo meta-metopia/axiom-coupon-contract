@@ -113,8 +113,8 @@ contract NFTCouponFactory is
         return CreateCouponResponse("");
     }
 
-    function transferCoupon(
-        TransferCouponOpts memory transferCouponOptions
+    function mintCoupon(
+        MintCouponOpts memory transferCouponOptions
     ) external override onlyWhileListedUsers {
         (
             uint256 _contractAddressIndex,
@@ -130,7 +130,7 @@ contract NFTCouponFactory is
 
         nftContract.mint(transferCouponOptions.receiverAddr, _tokenIdValue);
         userOwnedContractsCount[transferCouponOptions.receiverAddr]++;
-        emit CouponTransferred(
+        emit CouponMinted(
             transferCouponOptions.couponId,
             msg.sender,
             transferCouponOptions.receiverAddr
@@ -237,5 +237,22 @@ contract NFTCouponFactory is
 
         nftContract.redeem(_tokenIdValue, redeemCouponOpts);
         emit CouponRedeemed(redeemCouponOpts.couponId, msg.sender);
+    }
+
+    function getNftAddressByCouponId(
+        string memory couponId
+    ) external view override returns (address nftAddress, uint256 tokenId) {
+        (
+            uint256 _contractAddressIndex,
+            uint256 _tokenIdValue
+        ) = parseCouponToken(couponId);
+        INFTContract nftContract = addedContracts[_contractAddressIndex];
+        address contractAddress = address(nftContract);
+        require(
+            address(contractAddress) != address(0),
+            "40401: NFT contract for the given coupon id not found"
+        );
+
+        return (contractAddress, _tokenIdValue);
     }
 }
