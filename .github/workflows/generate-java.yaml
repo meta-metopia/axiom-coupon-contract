@@ -32,9 +32,9 @@ jobs:
       - name: Install Web3J
         run: curl -L get.web3j.io | sh
       - name: Generate Java code from NFT Factory ABI
-        run: ~/.web3j/web3j generate solidity -a artifacts/abi/factory.abi.json -o artifacts/sdk/java -p com.axiom.network.nft
+        run: ~/.web3j/web3j generate solidity -a artifacts/abi/factory.json -o artifacts/sdk/java -p com.axiom.network.nft
       - name: Generate Java code from NFT ABI
-        run: ~/.web3j/web3j generate solidity -a artifacts/abi/nft.abi.json -o artifacts/sdk/java -p com.axiom.network.nft
+        run: ~/.web3j/web3j generate solidity -a artifacts/abi/nft.json -o artifacts/sdk/java -p com.axiom.network.nft
       - name: Zip sdk
         run: mkdir -p artifacts/sdk/output && zip -r artifacts/sdk/output/sdk-java.zip artifacts/sdk/java
       - name: Upload NFT ABI to release

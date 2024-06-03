@@ -20,6 +20,6 @@
     "coverage": "hardhat coverage",
     "test": "hardhat test",
     "deploy:contract": "hardhat run scripts/deploy.ts --network gemini",
-    "deploy:contract-test": "hardhat run scripts/deploy.ts --network hardhat"
+    "deploy:contract-test": "hardhat run scripts/deploy.ts --network local"
   }
 }
