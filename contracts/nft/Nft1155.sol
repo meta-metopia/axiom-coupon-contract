@@ -88,9 +88,15 @@ contract NFTContract is
             "40005: NFT already redeemed"
         );
 
-        require(_owners[id] == msg.sender, "40006: User is not the owner and cannot transfer the NFT on behalf of the owner");
+        require(
+            _owners[id] == msg.sender,
+            "40006: User is not the owner and cannot transfer the NFT on behalf of the owner"
+        );
 
-        require(_metadata.rule.isTransfer, "40007: Transfer not allowed due to rule restrictions");
+        require(
+            _metadata.rule.isTransfer,
+            "40007: Transfer not allowed due to rule restrictions"
+        );
 
         safeTransferFrom(msg.sender, to, id, 1, "");
         _ownedNFTs[to].push(id);
@@ -217,6 +223,8 @@ contract NFTContract is
     ) external view onlyInitialized returns (GetTokenByIdResponse memory) {
         address owner = _owners[id];
         uint256 mintTime = _mintTime[id];
+
+        require(owner != address(0), "40402: Given token id not found");
 
         return
             GetTokenByIdResponse({

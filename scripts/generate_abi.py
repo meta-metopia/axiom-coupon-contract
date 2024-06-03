@@ -11,7 +11,7 @@ with open("./artifacts/contracts/factory/Factory.sol/NFTCouponFactory.json") as 
         os.makedirs("./artifacts/abi")
 
     # create file
-    with open("./artifacts/abi/factory.abi.json", "w") as output_nft_abi:
+    with open("./artifacts/abi/factory.json", "w") as output_nft_abi:
         output_nft_abi.write(json.dumps(nft_abi["abi"], indent=4))
 
 
@@ -22,7 +22,7 @@ with open("./artifacts/contracts/nft/Nft1155.sol/NFTContract.json") as nft_contr
         os.makedirs("./artifacts/abi")
 
     # create file
-    with open("./artifacts/abi/nft.abi.json", "w") as output_nft_abi:
+    with open("./artifacts/abi/nft.json", "w") as output_nft_abi:
         output_nft_abi.write(json.dumps(nft_abi["abi"], indent=4))
 
 

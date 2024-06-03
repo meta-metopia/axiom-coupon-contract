@@ -1110,36 +1110,119 @@ describe("Nft1155", () => {
   });
 
   describe("GetById", () => {
-    interface Args {
-      numberOfCreatedNFTs: number;
-      address: () => Promise<string>;
-      expectIds: string[];
-    }
+    describe("should be able to get nft id without issue", () => {
+      interface Args {
+        numberOfCreatedNFTs: number;
+        address: () => Promise<string>;
+        expectIds: any[];
+        expectRevertMessage?: string;
+      }
 
-    const testCases: TestCase<Args>[] = [
-      {
-        name: "should be able to get nft by id",
-        args: {
-          numberOfCreatedNFTs: 1,
-          address: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return owner.address;
+      const testCases: TestCase<Args>[] = [
+        {
+          name: "should be able to get nft by id",
+          args: {
+            numberOfCreatedNFTs: 1,
+            address: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner.address;
+            },
+            expectIds: [0],
           },
-          expectIds: ["0101002010"],
         },
-      },
-    ];
+      ];
 
-    testCases.forEach(({ name, args }) => {
-      it(name, async () => {
+      testCases.forEach(({ name, args }) => {
+        it(name, async () => {
+          const nft = await hre.ethers.getContractFactory("NFTContract");
+          const address = await args.address();
+          const [owner] = await hre.ethers.getSigners();
+
+          const opts = {
+            creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+            author: "hello",
+            supply: Math.max(args.numberOfCreatedNFTs, 1),
+            name: "test",
+            desc: "test desc",
+            fieldId: "1",
+            price: "10",
+            currency: "CNY",
+            metadata: {
+              approvedMerchant: [
+                {
+                  approvedMerchantName: "test",
+                  approvedMerchantAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              approvedPayment: [
+                {
+                  approvedPaymentName: "test",
+                  approvedPaymentAddr:
+                    "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
+                },
+              ],
+              couponType: "1",
+              couponSubtitle: "Subtitle",
+              couponDetails: "Some",
+              url: "https://www.google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 0,
+                claimLimit: 0,
+                isTransfer: false,
+              },
+              reedemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          };
+          const contract = await nft.connect(owner).deploy([owner.address]);
+          await contract.connect(owner).initialize(opts, []);
+
+          expect(await contract.totalSupply()).to.be.equal(
+            Math.max(args.numberOfCreatedNFTs, 1)
+          );
+
+          for (let i = 0; i < args.numberOfCreatedNFTs; i++) {
+            const response = await contract.connect(owner).mint(address, i);
+            expect(response).to.be.ok;
+            const list = await contract.listByOwner(address);
+            expect(list).to.be.ok;
+            expect(list.length).to.be.equal(i + 1);
+          }
+
+          for (const id of args.expectIds) {
+            const item = await contract.getById(id);
+            expect(item.metadata.reedemState).to.be.equal(0);
+            expect(item.creatorAddress.toLowerCase()).to.be.equal(
+              owner.address.toLowerCase()
+            );
+            expect(item.metadata.approvedMerchant.length).to.be.equal(
+              opts.metadata.approvedMerchant.length
+            );
+            expect(item.metadata.approvedPayment.length).to.be.equal(
+              opts.metadata.approvedPayment.length
+            );
+            expect(item.supply).to.be.equal(opts.supply);
+            expect(item.name).to.be.equal(opts.name);
+            expect(item.desc).to.be.equal(opts.desc);
+            expect(item.fieldId).to.be.equal(opts.fieldId);
+          }
+        });
+      });
+    });
+
+    describe("should not be able to get non-existing nft id", () => {
+      it("should not be able to get nft by id", async () => {
         const nft = await hre.ethers.getContractFactory("NFTContract");
-        const address = await args.address();
         const [owner] = await hre.ethers.getSigners();
 
         const opts = {
           creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
           author: "hello",
-          supply: Math.max(args.numberOfCreatedNFTs, 1),
+          supply: 10,
           name: "test",
           desc: "test desc",
           fieldId: "1",
@@ -1179,35 +1262,9 @@ describe("Nft1155", () => {
         const contract = await nft.connect(owner).deploy([owner.address]);
         await contract.connect(owner).initialize(opts, []);
 
-        expect(await contract.totalSupply()).to.be.equal(
-          Math.max(args.numberOfCreatedNFTs, 1)
+        await expect(contract.getById(10)).to.be.revertedWith(
+          "40402: Given token id not found"
         );
-
-        for (let i = 0; i < args.numberOfCreatedNFTs; i++) {
-          const response = await contract.connect(owner).mint(address, i);
-          expect(response).to.be.ok;
-          const list = await contract.listByOwner(address);
-          expect(list).to.be.ok;
-          expect(list.length).to.be.equal(i + 1);
-        }
-
-        for (const id of args.expectIds) {
-          const item = await contract.getById(id);
-          expect(item.metadata.reedemState).to.be.equal(0);
-          expect(item.creatorAddress.toLowerCase()).to.be.equal(
-            owner.address.toLowerCase()
-          );
-          expect(item.metadata.approvedMerchant.length).to.be.equal(
-            opts.metadata.approvedMerchant.length
-          );
-          expect(item.metadata.approvedPayment.length).to.be.equal(
-            opts.metadata.approvedPayment.length
-          );
-          expect(item.supply).to.be.equal(opts.supply);
-          expect(item.name).to.be.equal(opts.name);
-          expect(item.desc).to.be.equal(opts.desc);
-          expect(item.fieldId).to.be.equal(opts.fieldId);
-        }
       });
     });
   });
