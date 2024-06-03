@@ -54,6 +54,9 @@ interface INFTCouponFactory {
 
     function redeemCoupon(RedeemCouponOpts memory redeemCouponOpts) external;
 
+    /**
+     * Get the NFT address and token ID by coupon ID
+     */
     function getNftAddressByCouponId(
         string memory couponId
     ) external view returns (address nftAddress, uint256 tokenId);
