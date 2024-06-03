@@ -8,6 +8,9 @@ async function deployFactoryWithContracts(num: number) {
     "0xfF6377b2a70F75b9Fd5A454a14B857049E31Dc1a",
     //mylink
     "0x4275297E78d1Bf77c42964Fe87A5DCca38853F27",
+    "0x6FDa8F1087CBA6D0c30fECC907aB869Fe2F45740",
+    "0x9814372208dCA62d52DF171de2B8Cc406275A35a",
+    "0x368484712e5382282CcE52589bE85780901778F2",
   ];
 
   const nftCouponFactory = await factory.deploy(initialOwners);
@@ -44,6 +47,6 @@ async function addApprovedUser(contract: string, address: string) {
 }
 
 (async () => {
-    const numberOfPredefinedContracts = 10;
-    await deployFactoryWithContracts(numberOfPredefinedContracts);
+  const numberOfPredefinedContracts = 10;
+  await deployFactoryWithContracts(numberOfPredefinedContracts);
 })();
