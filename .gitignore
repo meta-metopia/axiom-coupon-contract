@@ -19,3 +19,5 @@ abi-*
 .vscode
 bin
 ignition/deployments
+
+storage_data.json

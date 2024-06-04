@@ -1,19 +1,37 @@
-# Sample Hardhat Project
+# Axiom Consumption Coupon Contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+This is a smart contract for the Axiom Consumption Coupon. The contract is written in Solidity and is deployed on the Axiomesh blockchain.
 
-Try running some of the following tasks:
+## Getting Started
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
+## Deployment
+
+1. Create `.env` file with the following content:
+
+```bash
+PRIVATE_KEY=
 ```
 
-self approved
+2. Run the following command to deploy the contract to deployed to the Axiomesh blockchain:
 
+```bash
+pnpm deploy:contract
 ```
 
+or
+
+```bash
+pnpm deploy:contract-test
 ```
+
+to deploy to the local testnet.
+
+## Testing
+
+Run the following command to run the tests:
+
+```bash
+pnpm test
+```
+
+Tests are located in the `test` directory.
