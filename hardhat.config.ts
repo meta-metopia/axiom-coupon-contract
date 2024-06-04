@@ -17,6 +17,10 @@ const config: HardhatUserConfig = {
       },
     },
   },
+  typechain: {
+    outDir: "typechain-types",
+    target: "ethers-v6",
+  },
   networks: {
     gemini: {
       url: "https://rpc5.gemini.axiomesh.io",

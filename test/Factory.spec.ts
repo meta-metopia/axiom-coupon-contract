@@ -5,7 +5,7 @@ import {
   NFTContract,
   RedeemCouponOptsStruct,
 } from "../typechain-types/contracts/nft/Nft1155.sol/NFTContract";
-import { ListAllCouponsOptsStruct } from "../typechain-types/factory/Factory.sol/NFTCouponFactory";
+import { ListAllCouponsOptsStruct } from "../typechain-types/contracts/factory/Factory.sol/NFTCouponFactory";
 
 interface TestCase<Arg> {
   name: string;
@@ -539,85 +539,202 @@ describe("Factory", () => {
   });
 
   describe("listByOwner", () => {
-    interface Arg {
-      userAddress: () => Promise<string>;
-      expectedNumber: number;
-    }
+    describe("multiple coupon", () => {
+      interface Arg {
+        userAddress: () => Promise<string>;
+        expectedNumber: number;
+      }
 
-    const testCases: TestCase<Arg>[] = [
-      {
-        name: "should return empty when user doesn't own any nft",
-        args: {
-          userAddress: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return owner.address;
-          },
-          expectedNumber: 0,
-        },
-      },
-      {
-        name: "should return 1 when user owns 1 nft",
-        args: {
-          userAddress: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return owner.address;
-          },
-          expectedNumber: 1,
-        },
-      },
-      {
-        name: "should return correct number when user owns multiple nfts",
-        args: {
-          userAddress: async () => {
-            const [owner] = await hre.ethers.getSigners();
-            return owner.address;
-          },
-          expectedNumber: 3,
-        },
-      },
-    ];
-
-    testCases.forEach(({ name, args }) => {
-      it(name, async () => {
-        const { userAddress, expectedNumber } = args;
-
-        const FactoryContract = await hre.ethers.getContractFactory(
-          "NFTCouponFactory"
-        );
-
-        const createOpts = {
-          creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
-          author: "a",
-          supply: 10,
-          name: "Hello",
-          desc: "World",
-          fieldId: "1",
-          price: "10",
-          currency: "cny",
-          metadata: {
-            approvedMerchant: [],
-            approvedPayment: [],
-            couponType: "1",
-            couponSubtitle: "subtitle",
-            couponDetails: "",
-            url: "https://google.com",
-            expirationTime: 0,
-            expirationStartTime: 0,
-            rule: {
-              value: 1,
-              claimLimit: 1,
-              isTransfer: false,
+      const testCases: TestCase<Arg>[] = [
+        {
+          name: "should return empty when user doesn't own any nft",
+          args: {
+            userAddress: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner.address;
             },
-            redeemState: 0,
-            approveTime: 0,
-            approveDuration: 0,
+            expectedNumber: 0,
           },
-        };
+        },
+        {
+          name: "should return 1 when user owns 1 nft",
+          args: {
+            userAddress: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner.address;
+            },
+            expectedNumber: 1,
+          },
+        },
+        {
+          name: "should return correct number when user owns multiple nfts",
+          args: {
+            userAddress: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner.address;
+            },
+            expectedNumber: 3,
+          },
+        },
+      ];
 
-        const factory = await FactoryContract.deploy([]);
-        await factory.waitForDeployment();
+      testCases.forEach(({ name, args }) => {
+        it(name, async () => {
+          const { userAddress, expectedNumber } = args;
 
-        for (let i = 0; i < args.expectedNumber; i++) {
+          const FactoryContract = await hre.ethers.getContractFactory(
+            "NFTCouponFactory"
+          );
+
+          const createOpts = {
+            creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
+            author: "a",
+            supply: 10,
+            name: "Hello",
+            desc: "World",
+            fieldId: "1",
+            price: "10",
+            currency: "cny",
+            metadata: {
+              approvedMerchant: [],
+              approvedPayment: [],
+              couponType: "1",
+              couponSubtitle: "subtitle",
+              couponDetails: "",
+              url: "https://google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 1,
+                claimLimit: 1,
+                isTransfer: false,
+              },
+              redeemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          };
+
+          const factory = await FactoryContract.deploy([]);
+          await factory.waitForDeployment();
+
+          for (let i = 0; i < args.expectedNumber; i++) {
+            const NftContract = await hre.ethers.getContractFactory(
+              "NFTContract"
+            );
+            const nft = await NftContract.deploy([]);
+            await nft.waitForDeployment();
+
+            await nft.approve(await factory.getAddress());
+            await factory.addContract(nft);
+
+            await factory.createCoupon(createOpts);
+            await factory.mintCoupon({
+              couponId: `0101${i}020200`,
+              receiverAddr: await userAddress(),
+            });
+          }
+
+          const listOpts: ListAllCouponsOptsStruct = {
+            userAddress: await userAddress(),
+            page: 0,
+            pageSize: 0,
+          };
+          const response = await factory.listAllCoupons(listOpts);
+          expect(response.length).to.equal(expectedNumber);
+          for (let i = 0; i < expectedNumber; i++) {
+            expect(response[i].couponId).to.equal(`0101${i}020200`);
+          }
+        });
+      });
+    });
+
+    describe("single coupon", () => {
+      interface Arg {
+        userAddress: () => Promise<string>;
+        numberOfClaims: number;
+        supply: number;
+        expectedTokens: string[];
+      }
+
+      const testCases: TestCase<Arg>[] = [
+        {
+          name: "should return empty when user doesn't own any nft",
+          args: {
+            userAddress: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner.address;
+            },
+            supply: 100,
+            numberOfClaims: 10,
+            expectedTokens: [
+              "010100203000",
+              "010100203001",
+              "010100203002",
+              "010100203003",
+              "010100203004",
+              "010100203005",
+              "010100203006",
+              "010100203007",
+              "010100203008",
+              "010100203009",
+            ],
+          },
+        },
+        {
+          name: "should return empty when user doesn't own any nft",
+          args: {
+            userAddress: async () => {
+              const [owner] = await hre.ethers.getSigners();
+              return owner.address;
+            },
+            supply: 1,
+            numberOfClaims: 1,
+            expectedTokens: ["0101002010"],
+          },
+        },
+      ];
+
+      testCases.forEach(({ name, args }) => {
+        it(name, async () => {
+          const { userAddress, supply, expectedTokens, numberOfClaims } = args;
+
+          const FactoryContract = await hre.ethers.getContractFactory(
+            "NFTCouponFactory"
+          );
+
+          const createOpts = {
+            creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
+            author: "a",
+            supply: supply,
+            name: "Hello",
+            desc: "World",
+            fieldId: "1",
+            price: "10",
+            currency: "cny",
+            metadata: {
+              approvedMerchant: [],
+              approvedPayment: [],
+              couponType: "1",
+              couponSubtitle: "subtitle",
+              couponDetails: "",
+              url: "https://google.com",
+              expirationTime: 0,
+              expirationStartTime: 0,
+              rule: {
+                value: 1,
+                claimLimit: 1,
+                isTransfer: false,
+              },
+              redeemState: 0,
+              approveTime: 0,
+              approveDuration: 0,
+            },
+          };
+
+          const factory = await FactoryContract.deploy([]);
+          await factory.waitForDeployment();
+
           const NftContract = await hre.ethers.getContractFactory(
             "NFTContract"
           );
@@ -626,24 +743,27 @@ describe("Factory", () => {
 
           await nft.approve(await factory.getAddress());
           await factory.addContract(nft);
-
           await factory.createCoupon(createOpts);
-          await factory.mintCoupon({
-            couponId: `0101${i}020200`,
-            receiverAddr: await userAddress(),
-          });
-        }
 
-        const listOpts: ListAllCouponsOptsStruct = {
-          userAddress: await userAddress(),
-          page: 0,
-          pageSize: 0,
-        };
-        const response = await factory.listAllCoupons(listOpts);
-        expect(response.length).to.equal(expectedNumber);
-        for (let i = 0; i < expectedNumber; i++) {
-          expect(response[i].couponId).to.equal(`0101${i}020200`);
-        }
+          for (let i = 0; i < numberOfClaims; i++) {
+            await factory.mintCoupon({
+              couponId: `0101002020${i}`,
+              receiverAddr: await userAddress(),
+            });
+          }
+          const listOpts: ListAllCouponsOptsStruct = {
+            userAddress: await userAddress(),
+            page: 0,
+            pageSize: 0,
+          };
+
+          for (const expectedToken of expectedTokens) {
+            const response = await factory.listAllCoupons(listOpts);
+            expect(response.length).to.equal(numberOfClaims);
+            expect(response.find((r) => r.couponId === expectedToken)).not.to.be
+              .undefined;
+          }
+        });
       });
     });
   });

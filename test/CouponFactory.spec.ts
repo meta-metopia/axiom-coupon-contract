@@ -2,7 +2,7 @@ import { expect } from "chai";
 import hre from "hardhat";
 
 describe("CouponFactory", () => {
-  describe("createCoupon", () => {
+  describe("createCouponStartingToken", () => {
     const testCases = [
       {
         tokenSupply: 1,
@@ -34,9 +34,56 @@ describe("CouponFactory", () => {
         const coupon = await CouponFactory.deploy();
         await coupon.waitForDeployment();
 
-        const couponCode = await coupon.generateCouponToken(
+        const couponCode = await coupon.generateCouponStartingToken(
           testCase.contractIndex,
           testCase.tokenSupply
+        );
+
+        expect(couponCode).to.be.equal(testCase.expectedCouponCode);
+      })
+    );
+  });
+
+  describe("createCoupon", () => {
+    const testCases = [
+      {
+        tokenSupply: 1,
+        contractIndex: 0,
+        tokenIndex: 0,
+        expectedCouponCode: "0101002010",
+      },
+      {
+        tokenSupply: 10,
+        contractIndex: 0,
+        tokenIndex: 9,
+        expectedCouponCode: "01010020209",
+      },
+      {
+        tokenSupply: 100,
+        contractIndex: 0,
+        tokenIndex: 2,
+        expectedCouponCode: "010100203002",
+      },
+      {
+        tokenSupply: 100,
+        contractIndex: 100,
+        tokenIndex: 99,
+        expectedCouponCode: "01031000203099",
+      },
+    ];
+
+    testCases.forEach((testCase) =>
+      it("should be able to generate correct coupon code", async () => {
+        const CouponFactory = await hre.ethers.getContractFactory(
+          "CouponFactory"
+        );
+        const coupon = await CouponFactory.deploy();
+        await coupon.waitForDeployment();
+
+        const couponCode = await coupon.generateCouponToken(
+          testCase.contractIndex,
+          testCase.tokenSupply,
+          testCase.tokenIndex
         );
 
         expect(couponCode).to.be.equal(testCase.expectedCouponCode);

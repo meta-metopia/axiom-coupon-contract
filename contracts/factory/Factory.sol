@@ -101,7 +101,7 @@ contract NFTCouponFactory is
 
         // Initialize the nft contract with metadata and initial supply
         nftContract.initialize(createCouponOpts, initialOwners);
-        string memory couponId = generateCouponToken(
+        string memory couponId = generateCouponStartingToken(
             createdContractIndexCounter,
             createCouponOpts.supply
         );
@@ -163,7 +163,8 @@ contract NFTCouponFactory is
 
                 string memory couponId = generateCouponToken(
                     i,
-                    nftContract.totalSupply()
+                    nftContract.totalSupply(),
+                    token.couponId
                 );
                 GetCouponByIdResponse memory item = GetCouponByIdResponse(
                     couponId,
