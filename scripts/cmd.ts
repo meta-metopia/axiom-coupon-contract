@@ -29,6 +29,8 @@ export class CommandLine {
             "deploy-contract",
             "add-user",
             "config-contract-address",
+            "create-coupon",
+            "add-more-contracts",
             "exit",
           ],
         });
@@ -48,6 +50,12 @@ export class CommandLine {
             break;
           case "add-user":
             await this.approveNewUser();
+            break;
+          case "create-coupon":
+            await this.createCoupon();
+            break;
+          case "add-more-contracts":
+            await this.addMultipleContractToFactory();
             break;
           case "exit":
             return;
@@ -192,5 +200,20 @@ export class CommandLine {
     }
 
     await this.contract.createCoupon(contractAddress);
+  }
+
+  async addMultipleContractToFactory() {
+    const contractAddress = await this.storage.get<string>("contractAddress");
+    if (!contractAddress) {
+      consola.error("No contract found. Please deploy a contract first.");
+      return;
+    }
+
+    const numberOfContracts = parseInt(
+      (await consola.prompt("Enter the number of contracts to add")) as string,
+      10
+    );
+
+    await this.contract.addMoreNft(numberOfContracts, contractAddress);
   }
 }
