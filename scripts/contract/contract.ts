@@ -122,4 +122,12 @@ export class Contract {
     await nftCouponFactory.approve(address);
     consola.success("User added to approved list");
   }
+
+  async listNftByOwner(contract: string, address: string) {
+    const factory = await hre.ethers.getContractFactory("NFTCouponFactory");
+    const nftCouponFactory = factory.attach(contract) as NFTContract;
+
+    const nftList = await nftCouponFactory.listByOwner(address);
+    consola.info("NFT list for user:", nftList);
+  }
 }

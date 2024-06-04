@@ -141,10 +141,6 @@ contract NFTCouponFactory is
         ListAllCouponsOpts memory listAllCouponsOpts
     ) external view override returns (GetCouponByIdResponse[] memory) {
         uint256 totalItems = 0;
-        uint256 size = userOwnedContractsCount[listAllCouponsOpts.userAddress];
-        GetCouponByIdResponse[] memory items = new GetCouponByIdResponse[](
-            size
-        );
 
         for (uint256 i = 0; i < createdContractIndexCounter; i++) {
             INFTContract nftContract = couponContracts[i];
@@ -159,29 +155,49 @@ contract NFTCouponFactory is
             );
 
             for (uint256 j = 0; j < response.length; j++) {
-                GetTokenByIdResponse memory token = response[j];
+                totalItems++;
+            }
+        }
 
+        GetCouponByIdResponse[] memory items = new GetCouponByIdResponse[](
+            totalItems
+        );
+
+        uint256 index = 0;
+        for (uint256 i = 0; i < createdContractIndexCounter; i++) {
+            INFTContract nftContract = couponContracts[i];
+            address contractAddress = address(nftContract);
+            require(
+                address(contractAddress) != address(0),
+                "40401: NFT contract for the given coupon id not found"
+            );
+
+            GetTokenByIdResponse[] memory response = nftContract.listByOwner(
+                listAllCouponsOpts.userAddress
+            );
+
+            for (uint256 j = 0; j < response.length; j++) {
                 string memory couponId = generateCouponToken(
                     i,
                     nftContract.totalSupply(),
-                    token.couponId
+                    response[j].couponId
                 );
                 GetCouponByIdResponse memory item = GetCouponByIdResponse(
                     couponId,
-                    token.creatorAddress,
-                    token.author,
-                    token.mintTime,
-                    token.ownerAddr,
-                    token.ownerTime,
-                    token.supply,
-                    token.name,
-                    token.desc,
-                    token.fieldId,
-                    token.currency,
-                    token.metadata
+                    response[j].creatorAddress,
+                    response[j].author,
+                    response[j].mintTime,
+                    response[j].ownerAddr,
+                    response[j].ownerTime,
+                    response[j].supply,
+                    response[j].name,
+                    response[j].desc,
+                    response[j].fieldId,
+                    response[j].currency,
+                    response[j].metadata
                 );
-                items[totalItems] = item;
-                totalItems++;
+                items[index] = item;
+                index++;
             }
         }
 
