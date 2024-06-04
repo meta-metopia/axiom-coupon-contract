@@ -3,21 +3,13 @@ import {
   NFTContract,
   NFTCouponFactory,
   NFTCouponFactory__factory,
-} from "../typechain-types";
+} from "../../typechain-types";
 import Progress from "ts-progress";
+import { StorageClass } from "../storage/storage.interface";
+import consola from "consola";
 
 export class Contract {
   private factory?: NFTCouponFactory__factory;
-  private initialOwners = [
-    //eft
-    "0xfF6377b2a70F75b9Fd5A454a14B857049E31Dc1a",
-    //mylink
-    "0x4275297E78d1Bf77c42964Fe87A5DCca38853F27",
-    "0x6FDa8F1087CBA6D0c30fECC907aB869Fe2F45740",
-    "0x9814372208dCA62d52DF171de2B8Cc406275A35a",
-    "0x368484712e5382282CcE52589bE85780901778F2",
-    "0x6A689Ca550CA3c460C7033D10B92963259BdE2D6",
-  ];
 
   constructor() {}
 
@@ -25,13 +17,13 @@ export class Contract {
     this.factory = await hre.ethers.getContractFactory("NFTCouponFactory");
   }
 
-  async deployFactoryWithContracts(num: number) {
+  async deployFactoryWithContracts(num: number, initialOwners: string[]) {
     const progress = Progress.create({
       total: num + 1,
       title: "Deploying NFTCouponFactory with contracts",
     });
     const nftCouponFactory = (await this.factory!.deploy(
-      this.initialOwners
+      initialOwners
     )) as NFTCouponFactory;
 
     await nftCouponFactory.waitForDeployment();
@@ -40,18 +32,18 @@ export class Contract {
     for (let i = 0; i < num; i++) {
       progress.update();
       const nftCoupon = await hre.ethers.getContractFactory("NFTContract");
-      const nftCouponContract = await nftCoupon.deploy(this.initialOwners);
+      const nftCouponContract = await nftCoupon.deploy(initialOwners);
       await nftCouponContract.waitForDeployment();
 
       await nftCouponContract.approve(await nftCouponFactory.getAddress());
       await nftCouponFactory.addContract(nftCouponContract);
     }
 
-    console.log(
+    consola.success(
       "NFTCouponFactory deployed to:",
       await nftCouponFactory.getAddress()
     );
-    console.log(
+    consola.success(
       "Available contracts:",
       await nftCouponFactory.getAvailableContractsCount()
     );
@@ -118,6 +110,6 @@ export class Contract {
     const nftCouponFactory = factory.attach(contract) as NFTContract;
 
     await nftCouponFactory.approve(address);
-    console.log("User added to approved list");
+    consola.success("User added to approved list");
   }
 }
