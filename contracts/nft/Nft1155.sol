@@ -100,7 +100,6 @@ contract NFTContract is
 
         safeTransferFrom(msg.sender, to, id, 1, "");
         _ownedNFTs[to].push(id);
-        _ownedNFTs[msg.sender].push(id);
         _owners[id] = to;
 
         // remove owned NFT from the sender
@@ -113,6 +112,8 @@ contract NFTContract is
                 index++;
             }
         }
+
+        _ownedNFTs[msg.sender] = newOwnedNFTs;
     }
 
     /**
