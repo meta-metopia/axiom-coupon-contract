@@ -23,7 +23,7 @@ contract CouponFactory {
     /**
      * Generate coupon token from contract address index and token ID index
      */
-    function generateCouponToken(
+    function generateCouponStartingToken(
         uint256 contractAddressIndex, // Index of the contract address
         uint256 tokenIdIndex // Index of the token ID
     ) public pure returns (string memory) {
@@ -48,6 +48,36 @@ contract CouponFactory {
                     _toTwoDigitString(2),
                     _toTwoDigitString(tokenIdLength),
                     _toValueString(0, tokenIdLength)
+                )
+            );
+    }
+
+    function generateCouponToken(
+        uint256 contractAddressIndex, // Index of the contract address
+        uint256 tokenSupply, // Total supply of the token
+        uint256 tokenIdIndex // Index of the token ID
+    ) public pure returns (string memory) {
+        // contract address length is depents on the contract address index
+        // for example, if the contract address index is 1, then the contract address length is 1
+        // if the contract address index is 10, then the contract address length is 2
+        // if the contract address index is 100, then the contract address length is 3
+        uint8 contractAddressLength = getAddressLength(contractAddressIndex);
+
+        // tokenAddress length is depents on the token address index
+        // for example, if the token address index is 1, then the token address length is 1
+        // if the token address index is 10, then the token address length is 2
+        // if the token address index is 100, then the token address length is 3
+        uint8 tokenIdLength = getAddressLength(tokenSupply);
+
+        return
+            string(
+                abi.encodePacked(
+                    _toTwoDigitString(1),
+                    _toTwoDigitString(contractAddressLength),
+                    _toValueString(contractAddressIndex, contractAddressLength),
+                    _toTwoDigitString(2),
+                    _toTwoDigitString(tokenIdLength),
+                    _toValueString(tokenIdIndex, tokenIdLength)
                 )
             );
     }

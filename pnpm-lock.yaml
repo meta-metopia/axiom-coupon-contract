@@ -39,9 +39,15 @@ importers:
       '@nomicfoundation/hardhat-toolbox':
         specifier: ^5.0.0
         version: 5.0.0(@nomicfoundation/hardhat-chai-matchers@2.0.6(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(chai@4.4.1)(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/hardhat-ignition-ethers@0.15.4(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/hardhat-ignition@0.15.4(@nomicfoundation/hardhat-verify@2.0.7(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/ignition-core@0.15.4)(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/hardhat-network-helpers@1.0.10(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@nomicfoundation/hardhat-verify@2.0.7(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(@typechain/ethers-v6@0.5.1(ethers@6.12.1)(typechain@8.3.2(typescript@5.4.5))(typescript@5.4.5))(@typechain/hardhat@9.1.0(@typechain/ethers-v6@0.5.1(ethers@6.12.1)(typechain@8.3.2(typescript@5.4.5))(typescript@5.4.5))(ethers@6.12.1)(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5))(typechain@8.3.2(typescript@5.4.5)))(@types/chai@4.3.16)(@types/mocha@10.0.6)(@types/node@20.12.13)(chai@4.4.1)(ethers@6.12.1)(hardhat-gas-reporter@1.0.10(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5))(solidity-coverage@0.8.12(hardhat@2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)))(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typechain@8.3.2(typescript@5.4.5))(typescript@5.4.5)
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
       hardhat:
         specifier: ^2.22.4
         version: 2.22.4(ts-node@10.9.2(@types/node@20.12.13)(typescript@5.4.5))(typescript@5.4.5)
+      ts-progress:
+        specifier: ^0.1.9
+        version: 0.1.9
 
 packages:
 
@@ -889,6 +895,9 @@ packages:
   charenc@0.0.2:
     resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
 
+  charm@1.0.2:
+    resolution: {integrity: sha512-wqW3VdPnlSWT4eRiYX+hcs+C6ViBPUWk1qTCd+37qw9kEm/a5n2qcyQDMBWvSYKN/ctqZzeXNQaeBjOetJJUkw==}
+
   check-error@1.0.3:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
 
@@ -968,6 +977,10 @@ packages:
   concat-stream@1.6.2:
     resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
     engines: {'0': node >= 0.8}
+
+  consola@3.2.3:
+    resolution: {integrity: sha512-I5qxpzLv+sJhTVEoLYNcTW+bThDCPsit0vLNKShZx6rLtpilNpmmeTPaeqJb9ZE9dV3DGaeby6Vuhrw38WjeyQ==}
+    engines: {node: ^14.18.0 || >=16.10.0}
 
   convert-source-map@1.9.0:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
@@ -2293,6 +2306,10 @@ packages:
       '@swc/wasm':
         optional: true
 
+  ts-progress@0.1.9:
+    resolution: {integrity: sha512-1jp591MFPSmQwPahlBN+NHPYOxTnackPHG0sCwZErTAb4XaH3IrK45H2PXQDJfuzXUIu1y9dLaB9l+tWBcB04g==}
+    engines: {node: '>=4'}
+
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
@@ -3596,6 +3613,10 @@ snapshots:
 
   charenc@0.0.2: {}
 
+  charm@1.0.2:
+    dependencies:
+      inherits: 2.0.4
+
   check-error@1.0.3:
     dependencies:
       get-func-name: 2.0.2
@@ -3700,6 +3721,8 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 2.3.8
       typedarray: 0.0.6
+
+  consola@3.2.3: {}
 
   convert-source-map@1.9.0: {}
 
@@ -5247,6 +5270,10 @@ snapshots:
       typescript: 5.4.5
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+
+  ts-progress@0.1.9:
+    dependencies:
+      charm: 1.0.2
 
   tslib@1.14.1: {}
 
