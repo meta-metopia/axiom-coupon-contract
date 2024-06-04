@@ -28,4 +28,18 @@ web3j generate solidity -a=./abi.json -o=./src/main/java -p=org.example.contract
 
 ## Usage
 
-查看src 文件下的代码来看如何使用私钥签名以及如何调用合约方法
+查看src 文件下的代码来看如何使用私钥签名以及如何调用合约方法。
+
+
+## 添加环境变量
+
+在目录下添加`.env`文件，添加以下内容：
+
+```shell
+RECEIVER_PRIVATE_KEY=
+RPC_URL=
+CONTRACT_ADDRESS=
+PRIVATE_KEY=
+```
+
+之后运行`src/main/java/org/example/Main.kt`文件即可。

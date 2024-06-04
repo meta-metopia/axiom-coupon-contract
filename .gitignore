@@ -71,3 +71,5 @@ bin/
 .idea
 
 /Users/sirily11/Desktop/axiom/web3j-demo/src/main/java/org/example/contract
+.env.production
+examples/java/.production.env

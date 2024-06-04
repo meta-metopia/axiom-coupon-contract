@@ -84,7 +84,17 @@ export class Contract {
       },
     };
     const response = await nftCouponFactory.createCoupon(opts as any);
-    await response.wait();
+
+    const availableCoupon = await nftCouponFactory.getAvailableContractsCount();
+    const result = await response.wait();
+
+    consola.success("Coupon created");
+    consola.info("Available coupons remaining:", availableCoupon);
+    const logs = result?.logs.filter(
+      (log: any) => log.fragment.name === "CouponCreated"
+    ) as any[];
+
+    consola.info("Coupon created with starting id:", logs[0].args[0]);
   }
 
   async addMoreNft(num: number, contract: string) {
