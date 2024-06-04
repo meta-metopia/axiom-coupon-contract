@@ -4,6 +4,9 @@ import { ContractConfig, Owner } from "./contract/contract.config.interface";
 import { StorageClass } from "./storage/storage.interface";
 import { consola } from "consola";
 
+/**
+ * Command line interface for interacting with the contract
+ */
 export class CommandLine {
   constructor(
     private readonly contract: Contract,
@@ -25,6 +28,7 @@ export class CommandLine {
             "set-owner",
             "deploy-contract",
             "add-user",
+            "config-contract-address",
             "exit",
           ],
         });
@@ -38,6 +42,9 @@ export class CommandLine {
             break;
           case "deploy-contract":
             await this.deployContract();
+            break;
+          case "config-contract-address":
+            await this.configContractAddress();
             break;
           case "add-user":
             await this.approveNewUser();
@@ -58,6 +65,11 @@ export class CommandLine {
     const tag = await consola.prompt("Enter a tag for the owner");
     const previousTag = (await this.storage.get<string[]>("tags")) ?? [];
     await this.storage.set("tags", [...previousTag, tag]);
+  }
+
+  async configContractAddress() {
+    const contractAddress = await consola.prompt("Enter contract address");
+    await this.storage.set("contractAddress", contractAddress);
   }
 
   async setOwner() {

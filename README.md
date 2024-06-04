@@ -1,5 +1,9 @@
 # Axiom Consumption Coupon Contract
 
+[![codecov](https://codecov.io/github/meta-metopia/axiom-coupon-contract/graph/badge.svg?token=l0KsmQhjk1)](https://codecov.io/github/meta-metopia/axiom-coupon-contract)
+
+[![Test and Release](https://github.com/meta-metopia/axiom-coupon-contract/actions/workflows/main.yaml/badge.svg)](https://github.com/meta-metopia/axiom-coupon-contract/actions/workflows/main.yaml)
+
 This is a smart contract for the Axiom Consumption Coupon. The contract is written in Solidity and is deployed on the Axiomesh blockchain.
 
 ## Getting Started
