@@ -4,6 +4,9 @@ import { ContractConfig, Owner } from "./contract/contract.config.interface";
 import { StorageClass } from "./storage/storage.interface";
 import { consola } from "consola";
 
+/**
+ * Command line interface for interacting with the contract
+ */
 export class CommandLine {
   constructor(
     private readonly contract: Contract,
