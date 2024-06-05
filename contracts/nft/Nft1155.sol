@@ -203,6 +203,10 @@ contract NFTContract is
         );
 
         for (uint256 i = 0; i < nfts.length; i++) {
+            Metadata memory tempMetadata = _metadata;
+            RedeemState tempRedeemState = _reedemState[nfts[i]];
+            tempMetadata.redeemState = tempRedeemState;
+
             GetTokenByIdResponse memory item = GetTokenByIdResponse({
                 couponId: nfts[i],
                 creatorAddress: _creatorAddress,
@@ -215,7 +219,7 @@ contract NFTContract is
                 desc: _desc,
                 fieldId: _fieldId,
                 currency: _currency,
-                metadata: _metadata
+                metadata: tempMetadata
             });
 
             response[i] = item;
@@ -232,6 +236,10 @@ contract NFTContract is
 
         require(owner != address(0), "40402: Given token id not found");
 
+        Metadata memory tempMetadata = _metadata;
+        RedeemState tempRedeemState = _reedemState[id];
+        tempMetadata.redeemState = tempRedeemState;
+
         return
             GetTokenByIdResponse({
                 couponId: id,
@@ -245,7 +253,7 @@ contract NFTContract is
                 desc: _desc,
                 fieldId: _fieldId,
                 currency: _currency,
-                metadata: _metadata
+                metadata: tempMetadata
             });
     }
 }

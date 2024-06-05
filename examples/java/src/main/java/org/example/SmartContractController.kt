@@ -101,4 +101,11 @@ class SmartContractController(
         println("Redeem Coupon: " + response.status)
 
     }
+
+    @Throws(Exception::class)
+    fun getCouponById(couponId: String) {
+        val response = factory.getCouponById(couponId).send()
+        println("Coupon Detail: " + response.couponId)
+        println("Redeem State: " + response.metadata.reedemState)
+    }
 }

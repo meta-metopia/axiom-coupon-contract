@@ -52,49 +52,57 @@ export class Contract {
   }
 
   async createCoupon(contract: string) {
-    const nftCouponFactory = this.factory!.attach(contract) as NFTCouponFactory;
-    const [owner] = await hre.ethers.getSigners();
+    try {
+      consola.info("Creating coupon to address:", contract);
+      const nftCouponFactory = this.factory!.attach(
+        contract
+      ) as NFTCouponFactory;
+      const [owner] = await hre.ethers.getSigners();
 
-    const opts = {
-      creatorAddress: owner.address,
-      author: "a",
-      supply: 10000,
-      name: "Hello",
-      desc: "World",
-      fieldId: "1",
-      price: "10",
-      currency: "cny",
-      metadata: {
-        approvedMerchant: [],
-        approvedPayment: [],
-        couponType: "1",
-        couponSubtitle: "subtitle",
-        couponDetails: "",
-        url: "https://google.com",
-        expirationTime: 0,
-        expirationStartTime: 0,
-        rule: {
-          value: 1,
-          claimLimit: 1,
-          isTransfer: true,
+      const opts = {
+        creatorAddress: owner.address,
+        author: "a",
+        supply: 10000,
+        name: "Hello",
+        desc: "World",
+        fieldId: "1",
+        price: "10",
+        currency: "cny",
+        metadata: {
+          approvedMerchant: [],
+          approvedPayment: [],
+          couponType: "1",
+          couponSubtitle: "subtitle",
+          couponDetails: "",
+          url: "https://google.com",
+          expirationTime: 0,
+          expirationStartTime: 0,
+          rule: {
+            value: 1,
+            claimLimit: 1,
+            isTransfer: true,
+          },
+          redeemState: 0,
+          approveTime: 0,
+          approveDuration: 0,
         },
-        redeemState: 0,
-        approveTime: 0,
-        approveDuration: 0,
-      },
-    };
-    const response = await nftCouponFactory.createCoupon(opts as any);
+      };
+      const response = await nftCouponFactory.createCoupon(opts as any);
 
-    const availableCoupon = await nftCouponFactory.getAvailableContractsCount();
-    const result = await response.wait();
+      const availableCoupon =
+        await nftCouponFactory.getAvailableContractsCount();
+      const result = await response.wait();
 
-    consola.success("Coupon created");
-    consola.info("Available coupons remaining:", availableCoupon);
-    const logs = result?.logs.filter(
-      (log: any) => log.fragment.name === "CouponCreated"
-    ) as any[];
+      consola.success("Coupon created");
+      consola.info("Available coupons remaining:", availableCoupon);
+      const logs = result?.logs.filter(
+        (log: any) => log.fragment.name === "CouponCreated"
+      ) as any[];
 
-    consola.info("Coupon created with starting id:", logs[0].args[0]);
+      consola.info("Coupon created with starting id:", logs[0].args[0]);
+    } catch (e) {
+      console.error("Error creating coupon", e);
+    }
   }
 
   async addMoreNft(num: number, contract: string) {
