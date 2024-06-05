@@ -698,6 +698,7 @@ describe("Factory", () => {
       testCases.forEach(({ name, args }) => {
         it(name, async () => {
           const { userAddress, supply, expectedTokens, numberOfClaims } = args;
+          const signers = await hre.ethers.getSigners();
 
           const FactoryContract = await hre.ethers.getContractFactory(
             "NFTCouponFactory"
@@ -762,6 +763,9 @@ describe("Factory", () => {
             expect(response.length).to.equal(numberOfClaims);
             expect(response.find((r) => r.couponId === expectedToken)).not.to.be
               .undefined;
+            expect(
+              response.every((r) => r.creatorAddress === signers[0].address)
+            ).to.be.true;
           }
         });
       });

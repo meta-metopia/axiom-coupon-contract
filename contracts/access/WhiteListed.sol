@@ -18,7 +18,7 @@ contract WhiteListed {
      */
     modifier onlyWhileListedUsers() {
         require(
-            whileListedUsers[msg.sender],
+            isWhiteListed(msg.sender),
             "40301: Only whitelisted users can call this function"
         );
         _;
@@ -36,5 +36,9 @@ contract WhiteListed {
      */
     function disapprove(address user) public {
         whileListedUsers[user] = false;
+    }
+
+    function isWhiteListed(address user) public view returns (bool) {
+        return whileListedUsers[user];
     }
 }
