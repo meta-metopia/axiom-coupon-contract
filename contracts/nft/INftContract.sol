@@ -47,6 +47,7 @@ interface INFTContract {
      */
     function initialize(
         CreateCouponOpts memory _createCouponOpts,
-        address[] memory _additionalOwners
+        address[] memory _additionalOwners,
+        address _initializedBy
     ) external;
 }

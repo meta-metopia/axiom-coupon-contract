@@ -131,7 +131,7 @@ describe("Nft1155", () => {
         }
 
         const contract = await nft.deploy(signers);
-        await contract.initialize(args.opts, []);
+        await contract.initialize(args.opts, [], signers[0].address);
         const response = await contract.waitForDeployment();
         expect(response).to.be.ok;
       });
@@ -448,7 +448,7 @@ describe("Nft1155", () => {
         const initialOwners = await args.initialOwners();
 
         const contract = await nft.deploy(initialOwners);
-        await contract.initialize(args.opts, []);
+        await contract.initialize(args.opts, [], initialOwners[0]);
 
         const signer = await args.minter();
         const [mintToAddress, tokenId] = await args.mintTo();
@@ -737,7 +737,7 @@ describe("Nft1155", () => {
         const nft = await hre.ethers.getContractFactory("NFTContract");
         const initialOwners = await args.initialOwners();
         const contract = await nft.deploy(initialOwners);
-        await contract.initialize(args.opts, []);
+        await contract.initialize(args.opts, [], initialOwners[0]);
 
         const signer = await args.mintSigner();
         const [mintToAddress, tokenId] = await args.mintTo();
@@ -852,7 +852,7 @@ describe("Nft1155", () => {
           },
         };
         const contract = await nft.connect(owner).deploy([owner.address]);
-        await contract.connect(owner).initialize(opts, []);
+        await contract.connect(owner).initialize(opts, [], owner.address);
 
         expect(await contract.totalSupply()).to.be.equal(
           Math.max(args.numberOfCreatedNFTs, 1)
@@ -1082,9 +1082,10 @@ describe("Nft1155", () => {
     testCases.forEach(({ name, args }) => {
       it(name, async () => {
         const nft = await hre.ethers.getContractFactory("NFTContract");
+        const [owner] = await hre.ethers.getSigners();
 
         const contract = await nft.deploy([]);
-        await contract.initialize(args.opts, []);
+        await contract.initialize(args.opts, [], owner.address);
 
         const [mintToAddress, tokenId] = await args.mintTo();
 
@@ -1179,7 +1180,7 @@ describe("Nft1155", () => {
             },
           };
           const contract = await nft.connect(owner).deploy([owner.address]);
-          await contract.connect(owner).initialize(opts, []);
+          await contract.connect(owner).initialize(opts, [], owner.address);
 
           expect(await contract.totalSupply()).to.be.equal(
             Math.max(args.numberOfCreatedNFTs, 1)
@@ -1260,7 +1261,7 @@ describe("Nft1155", () => {
           },
         };
         const contract = await nft.connect(owner).deploy([owner.address]);
-        await contract.connect(owner).initialize(opts, []);
+        await contract.connect(owner).initialize(opts, [], owner.address);
 
         await expect(contract.getById(10)).to.be.revertedWith(
           "40402: Given token id not found"

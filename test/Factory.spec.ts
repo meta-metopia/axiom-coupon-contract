@@ -698,6 +698,7 @@ describe("Factory", () => {
       testCases.forEach(({ name, args }) => {
         it(name, async () => {
           const { userAddress, supply, expectedTokens, numberOfClaims } = args;
+          const signers = await hre.ethers.getSigners();
 
           const FactoryContract = await hre.ethers.getContractFactory(
             "NFTCouponFactory"
@@ -762,6 +763,9 @@ describe("Factory", () => {
             expect(response.length).to.equal(numberOfClaims);
             expect(response.find((r) => r.couponId === expectedToken)).not.to.be
               .undefined;
+            expect(
+              response.every((r) => r.creatorAddress === signers[0].address)
+            ).to.be.true;
           }
         });
       });
@@ -854,6 +858,183 @@ describe("Factory", () => {
         const responseUser1 = await factory.listAllCoupons(listOpts);
         expect(responseUser1.length).to.equal(1);
         expect(responseUser1[0].ownerAddr).to.equal(user1.address);
+      });
+
+      it("should be able to multiple transfers and list", async () => {
+        const [owner, user1, user2, user3] = await hre.ethers.getSigners();
+        const FactoryContract = await hre.ethers.getContractFactory(
+          "NFTCouponFactory"
+        );
+
+        const createOpts = {
+          creatorAddress: "0x5fdF6784aEa0c6BAfe91c606158470827c17811b",
+          author: "a",
+          supply: 100,
+          name: "Hello",
+          desc: "World",
+          fieldId: "1",
+          price: "10",
+          currency: "cny",
+          metadata: {
+            approvedMerchant: [],
+            approvedPayment: [],
+            couponType: "1",
+            couponSubtitle: "subtitle",
+            couponDetails: "",
+            url: "https://google.com",
+            expirationTime: 0,
+            expirationStartTime: 0,
+            rule: {
+              value: 1,
+              claimLimit: 1,
+              isTransfer: true,
+            },
+            redeemState: 0,
+            approveTime: 0,
+            approveDuration: 0,
+          },
+        };
+
+        const factory = await FactoryContract.deploy([]);
+        await factory.waitForDeployment();
+
+        const NftContract = await hre.ethers.getContractFactory("NFTContract");
+        const nft = await NftContract.deploy([]);
+        await nft.waitForDeployment();
+
+        await nft.approve(await factory.getAddress());
+        await factory.addContract(nft);
+
+        await factory.createCoupon(createOpts);
+        // user1 mint 2 coupons and send to user1
+        await factory.mintCoupon({
+          couponId: `01010020200`,
+          receiverAddr: user1.address,
+        });
+        await factory.mintCoupon({
+          couponId: `01010020201`,
+          receiverAddr: user1.address,
+        });
+        await factory.mintCoupon({
+          couponId: `01010020202`,
+          receiverAddr: user1.address,
+        });
+        await factory.mintCoupon({
+          couponId: `01010020203`,
+          receiverAddr: user1.address,
+        });
+
+        const listOpts: ListAllCouponsOptsStruct = {
+          userAddress: user1.address,
+          page: 0,
+          pageSize: 0,
+        };
+        const response = await factory.listAllCoupons(listOpts);
+        expect(response.length).to.equal(4);
+
+        // user1 transfer the coupon to user2
+        // get the nft address by coupon id
+        const nftAddress = await factory.getNftAddressByCouponId(`01010020200`);
+        const nftAddress2 = await factory.getNftAddressByCouponId(
+          `01010020201`
+        );
+        const nftAddress3 = await factory.getNftAddressByCouponId(
+          `01010020202`
+        );
+        const nftAddress4 = await factory.getNftAddressByCouponId(
+          `01010020203`
+        );
+
+        const nftFromAddress = nft.attach(nftAddress.nftAddress) as NFTContract;
+        await nftFromAddress
+          .connect(user1)
+          .transfer(user2.address, nftAddress.tokenId);
+
+        await nftFromAddress
+          .connect(user1)
+          .transfer(user2.address, nftAddress2.tokenId);
+
+        // list the coupon for user2
+        const listOptsUser2: ListAllCouponsOptsStruct = {
+          userAddress: user2.address,
+          page: 0,
+          pageSize: 0,
+        };
+        const responseUser2 = await factory.listAllCoupons(listOptsUser2);
+        expect(responseUser2.length).to.equal(2);
+
+        // list the coupon for user1
+        const responseUser1 = await factory.listAllCoupons(listOpts);
+        expect(responseUser1.length).to.equal(2);
+
+        // user2 transfer the coupon to user1
+        const nftFromAddress2 = nft.attach(
+          nftAddress2.nftAddress
+        ) as NFTContract;
+        await nftFromAddress2
+          .connect(user2)
+          .transfer(user1.address, nftAddress2.tokenId);
+
+        // list the coupon for user2
+        const responseUser2AfterTransfer = await factory.listAllCoupons(
+          listOptsUser2
+        );
+        expect(responseUser2AfterTransfer.length).to.equal(1);
+
+        // list the coupon for user1
+        const responseUser1AfterTransfer = await factory.listAllCoupons(
+          listOpts
+        );
+        expect(responseUser1AfterTransfer.length).to.equal(3);
+
+        // user2 transfer the coupon to user3
+        await nftFromAddress2
+          .connect(user2)
+          .transfer(user3.address, nftAddress.tokenId);
+
+        // list the coupon for user2
+        const responseUser2AfterTransfer2 = await factory.listAllCoupons(
+          listOptsUser2
+        );
+        expect(responseUser2AfterTransfer2.length).to.equal(0);
+
+        // list the coupon for user1
+        const responseUser1AfterTransfer2 = await factory.listAllCoupons(
+          listOpts
+        );
+        expect(responseUser1AfterTransfer2.length).to.equal(3);
+
+        // list the coupon for user3
+        const listOptsUser3: ListAllCouponsOptsStruct = {
+          userAddress: user3.address,
+          page: 0,
+          pageSize: 0,
+        };
+        const responseUser3 = await factory.listAllCoupons(listOptsUser3);
+        expect(responseUser3.length).to.equal(1);
+
+        // user1 transfer the coupon to user3
+        await nftFromAddress
+          .connect(user1)
+          .transfer(user3.address, nftAddress2.tokenId);
+
+        // list the coupon for user2
+        const responseUser2AfterTransfer3 = await factory.listAllCoupons(
+          listOptsUser2
+        );
+        expect(responseUser2AfterTransfer3.length).to.equal(0);
+
+        // list the coupon for user1
+        const responseUser1AfterTransfer3 = await factory.listAllCoupons(
+          listOpts
+        );
+        expect(responseUser1AfterTransfer3.length).to.equal(2);
+
+        // list the coupon for user3
+        const responseUser3AfterTransfer = await factory.listAllCoupons(
+          listOptsUser3
+        );
+        expect(responseUser3AfterTransfer.length).to.equal(2);
       });
     });
   });

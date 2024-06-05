@@ -54,15 +54,20 @@ contract NFTContract is
 
     function initialize(
         CreateCouponOpts memory _createCouponOpts,
-        address[] memory _additionalOwners
+        address[] memory _additionalOwners,
+        address _initializedBy
     ) external onlyWhileListedUsers {
         for (uint256 i = 0; i < _additionalOwners.length; i++) {
             approve(_additionalOwners[i]);
         }
+        require(
+            isWhiteListed(_initializedBy),
+            "40301: Only whitelisted users can call this function"
+        );
         _isInitialized = true;
         _setURI(_createCouponOpts.metadata.url);
         initializeMetadata(_createCouponOpts.metadata);
-        _creatorAddress = msg.sender;
+        _creatorAddress = _initializedBy;
         _author = _createCouponOpts.author;
         _fieldId = _createCouponOpts.fieldId;
         _price = _createCouponOpts.price;
