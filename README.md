@@ -10,10 +10,18 @@ This is a smart contract for the Axiom Consumption Coupon. The contract is writt
 
 ## Deployment
 
+We have a well designed cli for contract interactions
+
+![cli](./assets/cli.png)
+
 1. Create `.env` file with the following content:
 
 ```bash
 PRIVATE_KEY=
+# optional
+UPSTASH_REDIS_REST_URL=
+# optional
+UPSTASH_REDIS_REST_TOKEN=
 ```
 
 2. Run the following command to deploy the contract to deployed to the Axiomesh blockchain:
@@ -29,6 +37,13 @@ pnpm deploy:contract-test
 ```
 
 to deploy to the local testnet.
+
+> Side note: You can decide the storage for your smart contract by changing the storage class in the deploy script.
+
+```typescript
+const localStorage = new LocalStorage("storage_data.json");
+const upstashStorage = new UpstashStorage();
+```
 
 ## Testing
 

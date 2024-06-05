@@ -7,7 +7,7 @@ import fs from "fs";
  */
 export class LocalStorage<T> implements StorageClass<T> {
   constructor(private readonly filename: string) {}
-  private data: Record<string, any> = {};
+  private data: Record<keyof T, any> = {} as any;
 
   async initialize(): Promise<void> {
     // read the file and load the data
@@ -20,12 +20,12 @@ export class LocalStorage<T> implements StorageClass<T> {
     }
   }
 
-  async set<D>(key: string, value: D) {
+  async set<D>(key: keyof T, value: D) {
     this.data[key] = value;
     fs.writeFileSync(this.filename, JSON.stringify(this.data, null, 4));
   }
 
-  async get<D>(key: string): Promise<D | null> {
+  async get<D>(key: keyof T): Promise<D | null> {
     return this.data[key] ?? null;
   }
 }

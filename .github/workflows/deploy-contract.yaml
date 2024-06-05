@@ -1,0 +1,28 @@
+name: Deploy smart contract
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-contract:
+    name: Deploy contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - name: Install dependencies
+        run: pnpm install
+      - name: Deploy Contract
+        run: pnpm deploy:contract-ci
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
