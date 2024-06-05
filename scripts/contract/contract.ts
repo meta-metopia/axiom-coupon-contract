@@ -105,7 +105,7 @@ export class Contract {
     }
   }
 
-  async addMoreNft(num: number, contract: string) {
+  async addMoreNft(num: number, contract: string, initialOwners: string[]) {
     const nftCouponFactory = this.factory!.attach(contract) as NFTCouponFactory;
     const progress = Progress.create({
       total: num,
@@ -115,7 +115,7 @@ export class Contract {
     for (let i = 0; i < num; i++) {
       progress.update();
       const nftCoupon = await hre.ethers.getContractFactory("NFTContract");
-      const nftCouponContract = await nftCoupon.deploy([]);
+      const nftCouponContract = await nftCoupon.deploy(initialOwners);
       await nftCouponContract.waitForDeployment();
 
       await nftCouponContract.approve(await nftCouponFactory.getAddress());
@@ -137,5 +137,43 @@ export class Contract {
 
     const nftList = await nftCouponFactory.listByOwner(address);
     consola.info("NFT list for user:", nftList);
+  }
+
+  async approveUser(contract: string, address: string) {
+    const factory = await hre.ethers.getContractFactory("NFTCouponFactory");
+    const nftCouponFactory = factory.attach(contract) as NFTContract;
+
+    await nftCouponFactory.approve(address);
+    consola.success("User approved");
+  }
+
+  async isApproved(contract: string, address: string) {
+    const factory = await hre.ethers.getContractFactory("NFTCouponFactory");
+    const nftCouponFactory = factory.attach(contract) as NFTContract;
+
+    const isApproved = await nftCouponFactory.isWhiteListed(address);
+    consola.info("User is approved:", isApproved);
+  }
+
+  async isApprovedInCouponNft(
+    contract: string,
+    couponId: string,
+    address: string
+  ) {
+    const factory = await hre.ethers.getContractFactory("NFTCouponFactory");
+    const nftCouponFactory = factory.attach(contract) as NFTCouponFactory;
+
+    const couponResponse = await nftCouponFactory.getNftAddressByCouponId(
+      couponId
+    );
+
+    const nftContract = await hre.ethers.getContractFactory("NFTContract");
+    const nftContractInstance = nftContract.attach(
+      couponResponse.nftAddress
+    ) as NFTContract;
+    consola.info(
+      "User is approved:",
+      await nftContractInstance.isWhiteListed(address)
+    );
   }
 }

@@ -31,6 +31,9 @@ export class CommandLine {
             "config-contract-address",
             "create-coupon",
             "add-more-contracts",
+            "is-user-approved",
+            "is-approved-in-coupon-nft",
+            "approve-user",
             "exit",
           ],
         });
@@ -49,13 +52,22 @@ export class CommandLine {
             await this.configContractAddress();
             break;
           case "add-user":
-            await this.approveNewUser();
+            await this.addNewUser();
             break;
           case "create-coupon":
             await this.createCoupon();
             break;
           case "add-more-contracts":
             await this.addMultipleContractToFactory();
+            break;
+          case "is-user-approved":
+            await this.isUserApproved();
+            break;
+          case "approve-user":
+            await this.approveUser();
+            break;
+          case "is-approved-in-coupon-nft":
+            await this.isApprovedInCouponNft();
             break;
           case "exit":
             return;
@@ -144,7 +156,24 @@ export class CommandLine {
     await this.storage.set("contractAddress", contractAddress);
   }
 
-  async approveNewUser() {
+  async isApprovedInCouponNft() {
+    const contractAddress = await this.storage.get<string>("contractAddress");
+    if (!contractAddress) {
+      consola.error("No contract found. Please deploy a contract first.");
+      return;
+    }
+
+    const ownerAddress = await consola.prompt("Enter owner's address");
+    const couponId = await consola.prompt("Enter coupon id");
+    const isApproved = await this.contract.isApprovedInCouponNft(
+      contractAddress,
+      couponId as string,
+      ownerAddress as string
+    );
+    consola.info("Is user approved?", isApproved);
+  }
+
+  async addNewUser() {
     const tags = (await this.storage.get<string[]>("tags")) ?? [];
     if (tags.length === 0) {
       consola.error("No tags found. Please add a tag first.");
@@ -192,6 +221,32 @@ export class CommandLine {
     await this.storage.set<Owner[]>("owners", [...previousOwners, newOwner]);
   }
 
+  async isUserApproved() {
+    const contractAddress = await this.storage.get<string>("contractAddress");
+    if (!contractAddress) {
+      consola.error("No contract found. Please deploy a contract first.");
+      return;
+    }
+
+    const ownerAddress = await consola.prompt("Enter owner's address");
+    const isApproved = await this.contract.isApproved(
+      contractAddress,
+      ownerAddress as string
+    );
+    consola.info("Is user approved?", isApproved);
+  }
+
+  async approveUser() {
+    const contractAddress = await this.storage.get<string>("contractAddress");
+    if (!contractAddress) {
+      consola.error("No contract found. Please deploy a contract first.");
+      return;
+    }
+
+    const ownerAddress = await consola.prompt("Enter owner's address");
+    await this.contract.approveUser(contractAddress, ownerAddress as string);
+  }
+
   async createCoupon() {
     const contractAddress = await this.storage.get<string>("contractAddress");
     if (!contractAddress) {
@@ -214,6 +269,16 @@ export class CommandLine {
       10
     );
 
-    await this.contract.addMoreNft(numberOfContracts, contractAddress);
+    const owners = (await this.storage.get<Owner[]>("owners")) ?? [];
+    if (owners.length === 0) {
+      consola.error("No owners found. Please add an owner first.");
+      return;
+    }
+
+    await this.contract.addMoreNft(
+      numberOfContracts,
+      contractAddress,
+      owners.map((owner) => owner.address)
+    );
   }
 }
