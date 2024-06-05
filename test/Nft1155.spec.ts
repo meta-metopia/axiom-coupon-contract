@@ -522,7 +522,7 @@ describe("Nft1155", () => {
             };
             return opts;
           },
-          expectStatus: 0,
+          expectStatus: 1,
           opts: {
             creatorAddress: "0xD7b241DF11d12FFB5f9DFfF0C2c5357C36c9B206",
             author: "hello",
@@ -1262,7 +1262,6 @@ describe("Nft1155", () => {
         };
         const contract = await nft.connect(owner).deploy([owner.address]);
         await contract.connect(owner).initialize(opts, [], owner.address);
-
         await expect(contract.getById(10)).to.be.revertedWith(
           "40402: Given token id not found"
         );

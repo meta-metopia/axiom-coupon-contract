@@ -18,8 +18,8 @@ struct ApprovedPayment {
 }
 
 enum RedeemState {
-    REDEEMED,
-    NOT_REDEEMED
+    NOT_REDEEMED,
+    REDEEMED
 }
 
 struct Metadata {
