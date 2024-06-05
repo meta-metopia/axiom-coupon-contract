@@ -9,3 +9,5 @@ export interface ContractConfig {
   // stored tags for owner names
   tags: string[];
 }
+
+export type ContractKeys = keyof ContractConfig;

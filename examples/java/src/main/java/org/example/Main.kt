@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val controller =
         SmartContractController(contractAddress = contractAddress, rpcUrl = rpcUrl, privateKey = privateKey)
 
-    val couponId = "01010020500002"
+    val couponId = "01012020500103"
     controller.mintCoupon(couponId, receiverPrivateKey)
     controller.redeemCoupon(couponId, receiverPrivateKey)
 }
