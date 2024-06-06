@@ -8,8 +8,10 @@ import org.web3j.crypto.Keys
 import org.web3j.crypto.Sign
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
+import org.web3j.tx.FastRawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.tx.gas.StaticGasProvider
+import org.web3j.tx.response.PollingTransactionReceiptProcessor
 import org.web3j.utils.Numeric
 import java.math.BigInteger
 
@@ -46,10 +48,17 @@ class SmartContractController(
     private val factory: Factory by lazy {
         val web3j = Web3j.build(HttpService(this.rpcUrl))
         val provider = StaticGasProvider(BigInteger.valueOf(1000000000000L), BigInteger.valueOf(9000000))
+        // add transaction manager
+        val transactionProvider = FastRawTransactionManager(
+            web3j,
+            getCredentials(privateKey),
+            // change default sleep time from 15 to 1
+            PollingTransactionReceiptProcessor(web3j, 1, 40)
+        )
         Factory.load(
             contractAddress,
             web3j,
-            Credentials.create(privateKey),
+            transactionProvider,
             provider
         )
     }
